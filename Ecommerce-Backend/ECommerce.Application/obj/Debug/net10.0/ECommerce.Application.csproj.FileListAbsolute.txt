@@ -1,0 +1,15 @@
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\bin\Debug\net10.0\ECommerce.Application.deps.json
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\bin\Debug\net10.0\ECommerce.Application.dll
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\bin\Debug\net10.0\ECommerce.Application.pdb
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\bin\Debug\net10.0\ECommerce.Domain.dll
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\bin\Debug\net10.0\ECommerce.Domain.pdb
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\obj\Debug\net10.0\ECommerce.Application.csproj.AssemblyReference.cache
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\obj\Debug\net10.0\ECommerce.Application.GeneratedMSBuildEditorConfig.editorconfig
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\obj\Debug\net10.0\ECommerce.Application.AssemblyInfoInputs.cache
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\obj\Debug\net10.0\ECommerce.Application.AssemblyInfo.cs
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\obj\Debug\net10.0\ECommerce.Application.csproj.CoreCompileInputs.cache
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\obj\Debug\net10.0\ECommerc.670E0CBE.Up2Date
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\obj\Debug\net10.0\ECommerce.Application.dll
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\obj\Debug\net10.0\refint\ECommerce.Application.dll
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\obj\Debug\net10.0\ECommerce.Application.pdb
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\obj\Debug\net10.0\ref\ECommerce.Application.dll
