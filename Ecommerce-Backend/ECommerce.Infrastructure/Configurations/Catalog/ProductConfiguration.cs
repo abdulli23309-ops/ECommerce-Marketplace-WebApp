@@ -18,6 +18,7 @@ namespace ECommerce.Infrastructure.Data.Configurations.Catalog
             builder.Property(p => p.Status).IsRequired().HasMaxLength(50).HasDefaultValue("PendingApproval");
             builder.Property(p => p.IsDeleted).IsRequired().HasDefaultValue(false);
             builder.Property(p => p.CreatedAt).IsRequired().HasDefaultValueSql("SYSUTCDATETIME()");
+            builder.Property(p => p.StockQuantity).IsRequired().HasDefaultValue(0);
 
             builder.HasOne(p => p.Store)
                    .WithMany(s => s.Products)
@@ -28,6 +29,11 @@ namespace ECommerce.Infrastructure.Data.Configurations.Catalog
                    .WithMany(sc => sc.Products)
                    .HasForeignKey(p => p.SubCategoryId)
                    .OnDelete(DeleteBehavior.SetNull); // subcategory deletion sets FK to null
+
+            builder.HasOne(p => p.Brand)
+                   .WithMany(b => b.Products)
+                   .HasForeignKey(p => p.BrandId)
+                   .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasQueryFilter(p => !p.IsDeleted);
         }

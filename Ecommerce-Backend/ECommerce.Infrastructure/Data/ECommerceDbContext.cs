@@ -41,6 +41,11 @@ namespace ECommerce.Infrastructure.Data
         public DbSet<ParentOrder> ParentOrders { get; set; }
         public DbSet<SellerOrder> SellerOrders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<Brand> Brands { get; set; }
+        public DbSet<Shipment> Shipments { get; set; }
+        public DbSet<ShipmentTrackingHistory> ShipmentTrackingHistories { get; set; }
+        public DbSet<Review> Reviews { get; set; }
+        public DbSet<ReviewImage> ReviewImages { get; set; }
 
         // Payment
         public DbSet<Payment> Payments { get; set; }

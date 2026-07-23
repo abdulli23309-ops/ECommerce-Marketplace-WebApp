@@ -13,3 +13,4 @@ E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\
 E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\obj\Debug\net10.0\refint\ECommerce.Application.dll
 E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\obj\Debug\net10.0\ECommerce.Application.pdb
 E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\obj\Debug\net10.0\ref\ECommerce.Application.dll
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Application\obj\Debug\net10.0\ECommerce.Application.sourcelink.json

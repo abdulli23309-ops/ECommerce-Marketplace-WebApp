@@ -16,7 +16,9 @@ namespace ECommerce.Domain.Entities
         public bool IsDeleted { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
-
+        public Guid? BrandId { get; set; }
+        public Brand? Brand { get; set; }
+        public int StockQuantity { get; set; } = 0;
         public ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
         public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

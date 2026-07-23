@@ -9,3 +9,4 @@ E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Domain\obj\D
 E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Domain\obj\Debug\net10.0\refint\ECommerce.Domain.dll
 E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Domain\obj\Debug\net10.0\ECommerce.Domain.pdb
 E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Domain\obj\Debug\net10.0\ref\ECommerce.Domain.dll
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Domain\obj\Debug\net10.0\ECommerce.Domain.sourcelink.json

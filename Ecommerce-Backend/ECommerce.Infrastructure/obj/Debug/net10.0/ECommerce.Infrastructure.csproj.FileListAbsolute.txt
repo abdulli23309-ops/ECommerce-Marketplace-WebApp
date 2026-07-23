@@ -17,3 +17,4 @@ E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Infrastructu
 E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Infrastructure\obj\Debug\net10.0\ECommerce.Infrastructure.pdb
 E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Infrastructure\obj\Debug\net10.0\ECommerce.Infrastructure.genruntimeconfig.cache
 E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Infrastructure\obj\Debug\net10.0\ref\ECommerce.Infrastructure.dll
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.Infrastructure\obj\Debug\net10.0\ECommerce.Infrastructure.sourcelink.json
