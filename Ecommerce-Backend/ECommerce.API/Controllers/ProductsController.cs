@@ -23,5 +23,23 @@ namespace ECommerce.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProduct(CreateProductDto dto)
             => Ok(await _productService.CreateProductAsync(GetUserId(), dto));
+        [HttpGet("all")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetPagedProducts(
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10)
+        {
+            var result = await _productService.GetPagedProductsAsync(page, pageSize);
+            return Ok(result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateProduct(Guid id, UpdateProductDto dto)
+        {
+            var result = await _productService.UpdateProductAsync(id, dto);
+            if (result == null) return NotFound();
+            return Ok(result);
+        }
     }
+
 }

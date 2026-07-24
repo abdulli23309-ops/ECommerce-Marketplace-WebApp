@@ -9,7 +9,8 @@ namespace ECommerce.Application.Interfaces
         Task AddOrderItemAsync(OrderItem item);
         Task SaveChangesAsync();
         Task<IEnumerable<ParentOrder>> GetOrdersByUserIdAsync(Guid userId);
-        
+        Task<IEnumerable<ParentOrder>> GetAllAsync();
+
         Task<OrderItem?> GetOrderItemByIdAsync(Guid orderItemId);
     }
 }

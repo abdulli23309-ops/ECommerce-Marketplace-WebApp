@@ -1,4 +1,5 @@
 ﻿using ECommerce.Application.DTOs.Product;
+using ECommerce.Application.Helpers;
 using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 
@@ -63,6 +64,52 @@ namespace ECommerce.Application.Services
                 Description = product.Description,
                 BasePrice = product.BasePrice,
                 Status = product.Status
+            };
+        }
+        public async Task<PagedResult<ProductDto>> GetPagedProductsAsync(int page, int pageSize)
+        {
+            var pagedProducts = await _productRepo.GetPagedAsync(page, pageSize);
+
+            return new PagedResult<ProductDto>
+            {
+                Items = pagedProducts.Items.Select(p => new ProductDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    BasePrice = p.BasePrice,
+                    Status = p.Status,
+                    Images = p.ProductImages.Select(i => i.ImageUrl).ToList()
+                }),
+                TotalCount = pagedProducts.TotalCount,
+                Page = pagedProducts.Page,
+                PageSize = pagedProducts.PageSize
+            };
+        }
+        public async Task<ProductDto?> UpdateProductAsync(Guid productId, UpdateProductDto dto)
+        {
+            var product = await _productRepo.GetByIdAsync(productId);
+            if (product == null) return null;
+
+            product.Name = dto.Name;
+            product.Description = dto.Description;
+            product.BasePrice = dto.BasePrice;
+            product.StockQuantity = dto.StockQuantity;
+            product.SubCategoryId = dto.SubCategoryId;
+            product.BrandId = dto.BrandId;
+            product.UpdatedAt = DateTime.UtcNow;
+
+            _productRepo.Update(product);
+            await _productRepo.SaveChangesAsync();
+
+            return new ProductDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                BasePrice = product.BasePrice,
+                Status = product.Status,
+                Images = product.ProductImages.Select(i => i.ImageUrl).ToList()
             };
         }
     }

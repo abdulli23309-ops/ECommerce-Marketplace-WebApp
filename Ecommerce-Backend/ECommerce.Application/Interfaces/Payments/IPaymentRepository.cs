@@ -8,5 +8,6 @@ namespace ECommerce.Application.Interfaces
         Task AddAsync(Payment payment);
         void Update(Payment payment);
         Task SaveChangesAsync();
+        Task<Payment?> GetPaymentByIdAsync(Guid paymentId);
     }
 }

@@ -10,6 +10,8 @@ namespace ECommerce.Application.Interfaces
         Task<Store?> GetStoreBySellerIdAsync(Guid sellerProfileId);
         Task AddStoreAsync(Store store);
         void UpdateStore(Store store);
+        Task<IEnumerable<SellerProfile>> GetAllAsync();
+        Task<SellerProfile?> GetByIdAsync(Guid id);
         Task SaveChangesAsync();
     }
 }

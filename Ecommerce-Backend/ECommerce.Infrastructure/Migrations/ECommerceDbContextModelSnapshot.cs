@@ -542,6 +542,100 @@ namespace ECommerce.Infrastructure.Migrations
                     b.ToTable("RefreshTokens", (string)null);
                 });
 
+            modelBuilder.Entity("ECommerce.Domain.Entities.Refund", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<Guid>("PaymentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ReturnRequestId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PaymentId");
+
+                    b.HasIndex("ReturnRequestId")
+                        .IsUnique();
+
+                    b.ToTable("Refunds", (string)null);
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.ReturnImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("ReturnRequestId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReturnRequestId");
+
+                    b.ToTable("ReturnImages", (string)null);
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.ReturnRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<Guid>("OrderItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderItemId")
+                        .IsUnique();
+
+                    b.ToTable("ReturnRequests", (string)null);
+                });
+
             modelBuilder.Entity("ECommerce.Domain.Entities.Review", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1075,6 +1169,47 @@ namespace ECommerce.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ECommerce.Domain.Entities.Refund", b =>
+                {
+                    b.HasOne("ECommerce.Domain.Entities.Payment", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Domain.Entities.ReturnRequest", "ReturnRequest")
+                        .WithOne()
+                        .HasForeignKey("ECommerce.Domain.Entities.Refund", "ReturnRequestId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Payment");
+
+                    b.Navigation("ReturnRequest");
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.ReturnImage", b =>
+                {
+                    b.HasOne("ECommerce.Domain.Entities.ReturnRequest", "ReturnRequest")
+                        .WithMany("ReturnImages")
+                        .HasForeignKey("ReturnRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReturnRequest");
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.ReturnRequest", b =>
+                {
+                    b.HasOne("ECommerce.Domain.Entities.OrderItem", "OrderItem")
+                        .WithOne()
+                        .HasForeignKey("ECommerce.Domain.Entities.ReturnRequest", "OrderItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("OrderItem");
+                });
+
             modelBuilder.Entity("ECommerce.Domain.Entities.Review", b =>
                 {
                     b.HasOne("ECommerce.Domain.Entities.OrderItem", "OrderItem")
@@ -1264,6 +1399,11 @@ namespace ECommerce.Infrastructure.Migrations
                     b.Navigation("OrderItems");
 
                     b.Navigation("ProductImages");
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.ReturnRequest", b =>
+                {
+                    b.Navigation("ReturnImages");
                 });
 
             modelBuilder.Entity("ECommerce.Domain.Entities.Review", b =>

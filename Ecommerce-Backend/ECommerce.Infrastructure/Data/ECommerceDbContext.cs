@@ -46,7 +46,9 @@ namespace ECommerce.Infrastructure.Data
         public DbSet<ShipmentTrackingHistory> ShipmentTrackingHistories { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<ReviewImage> ReviewImages { get; set; }
-
+        public DbSet<ReturnRequest> ReturnRequests { get; set; }
+        public DbSet<ReturnImage> ReturnImages { get; set; }
+        public DbSet<Refund> Refunds { get; set; }
         // Payment
         public DbSet<Payment> Payments { get; set; }
 

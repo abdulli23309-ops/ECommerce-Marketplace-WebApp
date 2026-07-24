@@ -28,6 +28,11 @@ namespace ECommerce.Infrastructure.Repositories
          .Include(po => po.Payment)   // <-- add this line
          .Where(po => po.CustomerId == userId)
          .ToListAsync();
+        public async Task<IEnumerable<ParentOrder>> GetAllAsync()
+    => await _context.ParentOrders
+        .Include(po => po.SellerOrders)
+            .ThenInclude(so => so.OrderItems)
+        .ToListAsync();
 
         // OrderRepository.cs
         public async Task<OrderItem?> GetOrderItemByIdAsync(Guid orderItemId)

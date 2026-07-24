@@ -170,3 +170,5 @@ E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.API\bin\Debu
 E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.API\obj\Debug\net10.0\ECommerce.API.MvcApplicationPartsAssemblyInfo.cs
 E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.API\bin\Debug\net10.0\BCrypt-Net-Next.dll
 E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.API\obj\Debug\net10.0\ECommerce.API.sourcelink.json
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.API\bin\Debug\net10.0\FluentValidation.AspNetCore.dll
+E:\Internship\Project3\Ecommerce-WebApp\Ecommerce-Backend\ECommerce.API\bin\Debug\net10.0\FluentValidation.DependencyInjectionExtensions.dll

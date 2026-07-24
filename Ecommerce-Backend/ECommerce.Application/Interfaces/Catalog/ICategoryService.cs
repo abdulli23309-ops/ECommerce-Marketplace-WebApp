@@ -8,5 +8,7 @@ namespace ECommerce.Application.Interfaces
         Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto dto);
         Task<IEnumerable<SubCategoryDto>> GetSubCategoriesAsync(Guid categoryId);
         Task<SubCategoryDto> CreateSubCategoryAsync(Guid categoryId, CreateSubCategoryDto dto);
+        Task<CategoryDto?> UpdateCategoryAsync(Guid id, CreateCategoryDto dto);
+        Task<SubCategoryDto?> UpdateSubCategoryAsync(Guid categoryId, Guid subCategoryId, CreateSubCategoryDto dto);
     }
 }

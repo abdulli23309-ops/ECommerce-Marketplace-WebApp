@@ -29,6 +29,7 @@ namespace ECommerce.API.Controllers
             var result = await _authService.LoginAsync(dto);
             if (!result.Succeeded) return Unauthorized(result);
             return Ok(result);
+           
         }
 
         [HttpPost("refresh-token")]

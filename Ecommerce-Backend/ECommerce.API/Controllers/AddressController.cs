@@ -30,5 +30,13 @@ namespace ECommerce.API.Controllers
             await _addressService.DeleteAddressAsync(GetUserId(), addressId);
             return NoContent();
         }
+        [HttpPut("{id}/default")]
+        [Authorize]
+        public async Task<IActionResult> SetDefaultAddress(Guid id)
+        {
+            var success = await _addressService.SetDefaultAddressAsync(GetUserId(), id);
+            if (!success) return NotFound();
+            return NoContent();
+        }
     }
 }

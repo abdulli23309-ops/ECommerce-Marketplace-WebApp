@@ -1,4 +1,5 @@
-﻿using ECommerce.Application.Interfaces;
+﻿using ECommerce.Application.Helpers;
+using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,19 @@ namespace ECommerce.Infrastructure.Repositories
 
         public async Task AddImageAsync(ProductImage image)
             => await _context.ProductImages.AddAsync(image);
+
+        public async Task<PagedResult<Product>> GetPagedAsync(int page, int pageSize)
+        {
+            var query = _context.Products
+                .Where(p => !p.IsDeleted)
+                .AsQueryable();
+
+            return await query.ToPagedResultAsync(page, pageSize);
+        }
+        public async Task<IEnumerable<Product>> GetAllAsync()
+    => await _context.Products
+        .Include(p => p.Store)
+        .ToListAsync();
 
         public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
     }

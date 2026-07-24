@@ -50,10 +50,17 @@ namespace ECommerce.Application.Services
                 return new AuthResponseDto { Succeeded = false, Message = "Account deactivated." };
 
             var claims = new List<Claim>
+{
+    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+    new Claim(ClaimTypes.Email, user.Email),
+    new Claim("fullName", user.FullName)
+};
+
+            // Add roles
+            var roles = await _userRepo.GetUserRolesAsync(user.Id); // we need this method
+            foreach (var role in roles)
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim("fullName", user.FullName)
+                claims.Add(new Claim(ClaimTypes.Role, role));
             };
             var accessToken = _jwtService.GenerateAccessToken(claims);
             var refreshToken = _jwtService.GenerateRefreshToken();

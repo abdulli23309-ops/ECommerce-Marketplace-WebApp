@@ -18,6 +18,8 @@ namespace ECommerce.Infrastructure.Repositories
 
         public void Update(Payment payment)
             => _context.Payments.Update(payment);
+        public async Task<Payment?> GetPaymentByIdAsync(Guid paymentId)
+    => await _context.Payments.FindAsync(paymentId);
 
         public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
     }

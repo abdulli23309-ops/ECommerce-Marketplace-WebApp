@@ -26,5 +26,19 @@ namespace ECommerce.API.Controllers
         [HttpPost("{categoryId}/subcategories")]
         public async Task<IActionResult> CreateSubCategory(Guid categoryId, CreateSubCategoryDto dto)
             => Ok(await _service.CreateSubCategoryAsync(categoryId, dto));
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCategory(Guid id, CreateCategoryDto dto)
+        {
+            var result = await _service.UpdateCategoryAsync(id, dto);
+            if (result == null) return NotFound();
+            return Ok(result);
+        }
+        [HttpPut("{categoryId}/subcategories/{subCategoryId}")]
+        public async Task<IActionResult> UpdateSubCategory(Guid categoryId, Guid subCategoryId, CreateSubCategoryDto dto)
+        {
+            var result = await _service.UpdateSubCategoryAsync(categoryId, subCategoryId, dto);
+            if (result == null) return NotFound();
+            return Ok(result);
+        }
     }
 }

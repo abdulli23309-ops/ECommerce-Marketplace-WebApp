@@ -36,5 +36,26 @@ namespace ECommerce.Application.Services
             await _repo.SaveChangesAsync();
             return new SubCategoryDto { Id = sub.Id, Name = sub.Name, CategoryId = sub.CategoryId };
         }
+        public async Task<CategoryDto?> UpdateCategoryAsync(Guid id, CreateCategoryDto dto)
+        {
+            var category = await _repo.GetByIdAsync(id);
+            if (category == null) return null;
+            category.Name = dto.Name;
+            category.UpdatedAt = DateTime.UtcNow;
+            _repo.Update(category);
+            await _repo.SaveChangesAsync();
+            return new CategoryDto { Id = category.Id, Name = category.Name };
+        }
+        public async Task<SubCategoryDto?> UpdateSubCategoryAsync(Guid categoryId, Guid subCategoryId, CreateSubCategoryDto dto)
+        {
+            var sub = await _repo.GetSubCategoriesAsync(categoryId);
+            var target = sub.FirstOrDefault(s => s.Id == subCategoryId);
+            if (target == null) return null;
+            target.Name = dto.Name;
+            target.UpdatedAt = DateTime.UtcNow;
+            _repo.UpdateSubCategory(target);
+            await _repo.SaveChangesAsync();
+            return new SubCategoryDto { Id = target.Id, Name = target.Name, CategoryId = target.CategoryId };
+        }
     }
 }

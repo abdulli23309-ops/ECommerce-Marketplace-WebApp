@@ -79,5 +79,23 @@ namespace ECommerce.Application.Services
                 await _addressRepo.SaveChangesAsync();
             }
         }
+        public async Task<bool> SetDefaultAddressAsync(Guid userId, Guid addressId)
+        {
+            var target = await _addressRepo.GetByIdAsync(addressId);
+            if (target == null || target.UserId != userId)
+                return false;
+
+            var allAddresses = await _addressRepo.GetByUserIdAsync(userId);
+            foreach (var addr in allAddresses)
+            {
+                addr.IsDefault = false;
+                _addressRepo.Update(addr);
+            }
+
+            target.IsDefault = true;
+            _addressRepo.Update(target);
+            await _addressRepo.SaveChangesAsync();
+            return true;
+        }
     }
 }
