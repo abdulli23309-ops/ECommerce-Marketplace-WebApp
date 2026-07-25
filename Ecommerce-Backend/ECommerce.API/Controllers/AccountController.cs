@@ -1,6 +1,8 @@
 ﻿using ECommerce.Application.DTOs.Account;
-using Microsoft.AspNetCore.Mvc;
 using ECommerce.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ECommerce.API.Controllers
 {
@@ -45,6 +47,15 @@ namespace ECommerce.API.Controllers
         {
             await _authService.LogoutAsync(refreshToken);
             return NoContent();
+        }
+        [HttpPut("profile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile(UpdateProfileDto dto)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _authService.UpdateProfileAsync(userId, dto);
+            if (!result.Succeeded) return BadRequest(result);
+            return Ok(result);
         }
     }
 }

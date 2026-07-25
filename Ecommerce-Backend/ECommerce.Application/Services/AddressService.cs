@@ -79,6 +79,35 @@ namespace ECommerce.Application.Services
                 await _addressRepo.SaveChangesAsync();
             }
         }
+        public async Task<bool> UpdateAddressAsync(Guid userId, Guid addressId, CreateAddressDto dto)
+        {
+            var address = await _addressRepo.GetByIdAsync(addressId);
+            if (address == null || address.UserId != userId) return false;
+
+            address.FullName = dto.FullName;
+            address.PhoneNumber = dto.PhoneNumber;
+            address.AddressLine1 = dto.AddressLine1;
+            address.AddressLine2 = dto.AddressLine2;
+            address.City = dto.City;
+            address.State = dto.State;
+            address.PostalCode = dto.PostalCode;
+            address.IsDefault = dto.IsDefault;
+            address.UpdatedAt = DateTime.UtcNow;
+
+            if (dto.IsDefault)
+            {
+                var allAddresses = await _addressRepo.GetByUserIdAsync(userId);
+                foreach (var addr in allAddresses.Where(a => a.Id != addressId && a.IsDefault))
+                {
+                    addr.IsDefault = false;
+                    _addressRepo.Update(addr);
+                }
+            }
+
+            _addressRepo.Update(address);
+            await _addressRepo.SaveChangesAsync();
+            return true;
+        }
         public async Task<bool> SetDefaultAddressAsync(Guid userId, Guid addressId)
         {
             var target = await _addressRepo.GetByIdAsync(addressId);

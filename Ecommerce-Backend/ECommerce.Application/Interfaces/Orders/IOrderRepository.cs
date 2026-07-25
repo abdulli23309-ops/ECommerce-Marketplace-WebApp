@@ -10,7 +10,11 @@ namespace ECommerce.Application.Interfaces
         Task SaveChangesAsync();
         Task<IEnumerable<ParentOrder>> GetOrdersByUserIdAsync(Guid userId);
         Task<IEnumerable<ParentOrder>> GetAllAsync();
-
+        Task<IEnumerable<SellerOrder>> GetSellerOrdersByStoreIdAsync(Guid storeId);
+        Task<int> GetOrderCountAsync();
         Task<OrderItem?> GetOrderItemByIdAsync(Guid orderItemId);
+        // Added for Phase 0 security fix: lets the service layer verify a seller
+        // actually owns the SellerOrder they're trying to attach/update a shipment for.
+        Task<Guid?> GetStoreIdBySellerOrderIdAsync(Guid sellerOrderId);
     }
 }

@@ -12,6 +12,8 @@ namespace ECommerce.Application.Interfaces
         void UpdateStore(Store store);
         Task<IEnumerable<SellerProfile>> GetAllAsync();
         Task<SellerProfile?> GetByIdAsync(Guid id);
+        Task<int> GetSellerCountAsync();
+        Task<int> GetPendingSellerCountAsync();
         Task SaveChangesAsync();
     }
 }

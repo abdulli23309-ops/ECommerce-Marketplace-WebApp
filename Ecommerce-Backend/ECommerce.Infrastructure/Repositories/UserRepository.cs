@@ -44,6 +44,8 @@ namespace ECommerce.Infrastructure.Repositories
                 .Include(u => u.RefreshTokens)
                 .FirstOrDefaultAsync(u => u.RefreshTokens.Any(rt => rt.Token == refreshToken));
         }
+        public async Task<int> GetUserCountAsync()
+    => await _context.Users.CountAsync();
         public async Task<IList<string>> GetUserRolesAsync(Guid userId)
         {
             return await _context.UserRoles

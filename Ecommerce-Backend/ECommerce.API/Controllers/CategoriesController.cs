@@ -1,17 +1,22 @@
 ﻿using ECommerce.Application.DTOs.Catalog;
 using ECommerce.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    // Class-level: locked down by default. Reads are explicitly opened back up
+    // with [AllowAnonymous] below; writes stay SuperAdmin-only.
+    [Authorize(Roles = "SuperAdmin")]
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _service;
         public CategoriesController(ICategoryService service) => _service = service;
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll()
             => Ok(await _service.GetAllCategoriesAsync());
 
@@ -20,6 +25,7 @@ namespace ECommerce.API.Controllers
             => Ok(await _service.CreateCategoryAsync(dto));
 
         [HttpGet("{categoryId}/subcategories")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetSubCategories(Guid categoryId)
             => Ok(await _service.GetSubCategoriesAsync(categoryId));
 

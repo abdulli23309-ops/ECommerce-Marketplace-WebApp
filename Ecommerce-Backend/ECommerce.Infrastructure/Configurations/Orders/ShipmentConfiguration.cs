@@ -18,9 +18,9 @@ namespace ECommerce.Infrastructure.Data.Configurations.Orders
             builder.HasIndex(s => s.SellerOrderId).IsUnique(); // one shipment per seller order
 
             builder.HasOne(s => s.SellerOrder)
-                   .WithOne() // no navigation back to Shipment yet; can add later
-                   .HasForeignKey<Shipment>(s => s.SellerOrderId)
-                   .OnDelete(DeleteBehavior.Restrict);
+        .WithOne(so => so.Shipment)   // <-- map to the new navigation property
+        .HasForeignKey<Shipment>(s => s.SellerOrderId)
+        .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

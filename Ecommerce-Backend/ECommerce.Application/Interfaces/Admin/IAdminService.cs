@@ -22,6 +22,7 @@ namespace ECommerce.Application.Interfaces
         Task<IEnumerable<ReturnRequestAdminDto>> GetReturnsAsync();
         Task ApproveReturnAsync(Guid returnId);
         Task RejectReturnAsync(Guid returnId);
+        Task<AdminStatsDto> GetStatsAsync();
 
         // Refunds (existing service used directly in controller)
     }

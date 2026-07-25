@@ -1,5 +1,6 @@
 ﻿using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Enums;
 using ECommerce.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,6 +41,8 @@ namespace ECommerce.Infrastructure.Repositories.Returns
             .ToListAsync();
         public void Update(ReturnRequest returnRequest)
     => _context.ReturnRequests.Update(returnRequest);
+        public async Task<int> GetPendingReturnsCountAsync()
+    => await _context.ReturnRequests.CountAsync(r => r.Status == ReturnStatus.Requested);
 
         public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
     }

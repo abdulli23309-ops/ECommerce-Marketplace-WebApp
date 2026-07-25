@@ -80,6 +80,24 @@ namespace ECommerce.Application.Services
                 RefreshToken = refreshToken
             };
         }
+        public async Task<AuthResponseDto> UpdateProfileAsync(Guid userId, UpdateProfileDto dto)
+        {
+            var user = await _userRepo.GetByIdAsync(userId);
+            if (user == null) return new AuthResponseDto { Succeeded = false, Message = "User not found." };
+
+            // Check if email is already taken by another user
+            var existing = await _userRepo.GetByEmailAsync(dto.Email);
+            if (existing != null && existing.Id != userId)
+                return new AuthResponseDto { Succeeded = false, Message = "Email already in use." };
+
+            user.FullName = dto.FullName;
+            user.Email = dto.Email;
+            user.UpdatedAt = DateTime.UtcNow;
+            _userRepo.Update(user);
+            await _userRepo.SaveChangesAsync();
+
+            return new AuthResponseDto { Succeeded = true, Message = "Profile updated." };
+        }
 
         public async Task<AuthResponseDto> RefreshTokenAsync(string refreshToken)
         {

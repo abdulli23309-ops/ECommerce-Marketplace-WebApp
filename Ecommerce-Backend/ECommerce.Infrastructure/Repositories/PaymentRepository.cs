@@ -21,6 +21,14 @@ namespace ECommerce.Infrastructure.Repositories
         public async Task<Payment?> GetPaymentByIdAsync(Guid paymentId)
     => await _context.Payments.FindAsync(paymentId);
 
+        public async Task<IEnumerable<Payment>> GetAllAsync()
+    => await _context.Payments
+        .Include(p => p.ParentOrder)
+            .ThenInclude(po => po.Customer)
+        .ToListAsync();
+        public async Task<decimal> GetTotalRevenueAsync()
+    => await _context.Payments.SumAsync(p => p.Amount);
+
         public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
     }
 }

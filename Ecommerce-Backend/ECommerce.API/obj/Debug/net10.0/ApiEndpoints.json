@@ -33,6 +33,22 @@
   },
   {
     "ContainingType": "ECommerce.API.Controllers.AccountController",
+    "Method": "UpdateProfile",
+    "RelativePath": "api/Account/profile",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "ECommerce.Application.DTOs.Account.UpdateProfileDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AccountController",
     "Method": "RefreshToken",
     "RelativePath": "api/Account/refresh-token",
     "HttpMethod": "POST",
@@ -107,6 +123,27 @@
   },
   {
     "ContainingType": "ECommerce.API.Controllers.AddressController",
+    "Method": "UpdateAddress",
+    "RelativePath": "api/Address/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "ECommerce.Application.DTOs.Address.CreateAddressDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AddressController",
     "Method": "SetDefaultAddress",
     "RelativePath": "api/Address/{id}/default",
     "HttpMethod": "PUT",
@@ -125,6 +162,16 @@
     "ContainingType": "ECommerce.API.Controllers.AdminController",
     "Method": "GetOrders",
     "RelativePath": "api/Admin/orders",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AdminController",
+    "Method": "GetPayments",
+    "RelativePath": "api/Admin/payments",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -266,6 +313,16 @@
     "ContainingType": "ECommerce.API.Controllers.AdminController",
     "Method": "GetShipments",
     "RelativePath": "api/Admin/shipments",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AdminController",
+    "Method": "GetStats",
+    "RelativePath": "api/Admin/stats",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -604,6 +661,22 @@
   },
   {
     "ContainingType": "ECommerce.API.Controllers.ProductsController",
+    "Method": "GetById",
+    "RelativePath": "api/Products/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.ProductsController",
     "Method": "UpdateProduct",
     "RelativePath": "api/Products/{id}",
     "HttpMethod": "PUT",
@@ -618,6 +691,22 @@
       {
         "Name": "dto",
         "Type": "ECommerce.Application.DTOs.Product.UpdateProductDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.ProductsController",
+    "Method": "DeleteProduct",
+    "RelativePath": "api/Products/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
         "IsRequired": true
       }
     ],
@@ -640,6 +729,22 @@
         "Name": "pageSize",
         "Type": "System.Int32",
         "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.ProductsController",
+    "Method": "GetByStore",
+    "RelativePath": "api/Products/store/{storeId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "storeId",
+        "Type": "System.Guid",
+        "IsRequired": true
       }
     ],
     "ReturnTypes": []
@@ -762,6 +867,16 @@
   },
   {
     "ContainingType": "ECommerce.API.Controllers.SellerController",
+    "Method": "GetSellerOrders",
+    "RelativePath": "api/Seller/orders",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.SellerController",
     "Method": "CreateProfile",
     "RelativePath": "api/Seller/profile",
     "HttpMethod": "POST",
@@ -780,6 +895,16 @@
     "ContainingType": "ECommerce.API.Controllers.SellerController",
     "Method": "GetProfile",
     "RelativePath": "api/Seller/profile",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.SellerController",
+    "Method": "GetSellerStatus",
+    "RelativePath": "api/Seller/status",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,

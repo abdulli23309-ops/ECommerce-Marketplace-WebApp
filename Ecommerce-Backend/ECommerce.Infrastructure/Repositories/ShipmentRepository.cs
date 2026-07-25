@@ -28,6 +28,7 @@ namespace ECommerce.Infrastructure.Repositories.Orders
         public async Task<Shipment?> GetByIdAsync(Guid shipmentId)
             => await _context.Shipments
         .Include(s => s.TrackingHistories.OrderBy(h => h.Timestamp))
+        .Include(s => s.SellerOrder)
         .FirstOrDefaultAsync(s => s.Id == shipmentId);
         public async Task<IEnumerable<Shipment>> GetAllAsync()
     => await _context.Shipments.ToListAsync();

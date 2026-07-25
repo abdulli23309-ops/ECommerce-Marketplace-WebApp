@@ -16,30 +16,80 @@ namespace ECommerce.API.Controllers
 
         private Guid GetUserId() => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
+        // Seller's own products
         [HttpGet]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> GetMyProducts()
             => Ok(await _productService.GetStoreProductsAsync(GetUserId()));
 
+        // Create product (Seller only)
         [HttpPost]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> CreateProduct(CreateProductDto dto)
             => Ok(await _productService.CreateProductAsync(GetUserId(), dto));
+
+        // Public: paginated listing of approved products
         [HttpGet("all")]
         [AllowAnonymous]
         public async Task<IActionResult> GetPagedProducts(
-    [FromQuery] int page = 1,
-    [FromQuery] int pageSize = 10)
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
             var result = await _productService.GetPagedProductsAsync(page, pageSize);
             return Ok(result);
         }
 
+        // Public: single product detail
+        [HttpGet("{id:guid}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var product = await _productService.GetProductDetailAsync(id);
+            if (product == null) return NotFound();
+            return Ok(product);
+        }
+
+        // Public: products by store
+        [HttpGet("store/{storeId:guid}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetByStore(Guid storeId)
+        {
+            var products = await _productService.GetPublicStoreProductsAsync(storeId);
+            return Ok(products);
+        }
+
+        // Update product (Seller only, with ownership check)
         [HttpPut("{id}")]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> UpdateProduct(Guid id, UpdateProductDto dto)
         {
-            var result = await _productService.UpdateProductAsync(id, dto);
-            if (result == null) return NotFound();
-            return Ok(result);
+            try
+            {
+                var result = await _productService.UpdateProductAsync(GetUserId(), id, dto);
+                if (result == null) return NotFound();
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
+            }
+        }
+
+        // Delete product (soft delete, Seller only with ownership check)
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Seller")]
+        public async Task<IActionResult> DeleteProduct(Guid id)
+        {
+            try
+            {
+                var deleted = await _productService.DeleteProductAsync(GetUserId(), id);
+                if (!deleted) return NotFound();
+                return NoContent();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
+            }
         }
     }
-
 }

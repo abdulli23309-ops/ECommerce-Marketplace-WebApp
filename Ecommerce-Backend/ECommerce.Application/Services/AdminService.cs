@@ -2,6 +2,7 @@
 using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Application.Services.Admin
 {
@@ -12,22 +13,42 @@ namespace ECommerce.Application.Services.Admin
         private readonly IOrderRepository _orderRepo;
         private readonly IShipmentRepository _shipmentRepo;
         private readonly IReturnRepository _returnRepo;
+        private readonly IUserRepository _userRepo;
+        private readonly IPaymentRepository _paymentRepo;
 
         public AdminService(
             ISellerRepository sellerRepo,
             IProductRepository productRepo,
             IOrderRepository orderRepo,
             IShipmentRepository shipmentRepo,
-            IReturnRepository returnRepo)
+            IReturnRepository returnRepo,
+            IUserRepository userRepo,
+    IPaymentRepository paymentRepo)
         {
             _sellerRepo = sellerRepo;
             _productRepo = productRepo;
             _orderRepo = orderRepo;
             _shipmentRepo = shipmentRepo;
             _returnRepo = returnRepo;
+            _userRepo = userRepo;
+            _paymentRepo = paymentRepo;
         }
 
-        // Sellers
+        public async Task<AdminStatsDto> GetStatsAsync()
+        {
+            return new AdminStatsDto
+            {
+                TotalUsers = await _userRepo.GetUserCountAsync(),
+                TotalSellers = await _sellerRepo.GetSellerCountAsync(),
+                TotalProducts = await _productRepo.GetProductCountAsync(),
+                TotalOrders = await _orderRepo.GetOrderCountAsync(),
+                TotalRevenue = await _paymentRepo.GetTotalRevenueAsync(),
+                PendingSellerApprovals = await _sellerRepo.GetPendingSellerCountAsync(),
+                PendingProductApprovals = await _productRepo.GetPendingProductCountAsync(),
+                PendingReturns = await _returnRepo.GetPendingReturnsCountAsync()
+            };
+        }
+
         public async Task<IEnumerable<SellerAdminDto>> GetSellersAsync()
         {
             var sellers = await _sellerRepo.GetAllAsync();
@@ -62,7 +83,6 @@ namespace ECommerce.Application.Services.Admin
             await _sellerRepo.SaveChangesAsync();
         }
 
-        // Products
         public async Task<IEnumerable<ProductAdminDto>> GetProductsAsync()
         {
             var products = await _productRepo.GetAllAsync();
@@ -89,7 +109,6 @@ namespace ECommerce.Application.Services.Admin
             await _productRepo.SaveChangesAsync();
         }
 
-        // Orders
         public async Task<IEnumerable<ParentOrderAdminDto>> GetOrdersAsync()
         {
             var orders = await _orderRepo.GetAllAsync();
@@ -126,7 +145,6 @@ namespace ECommerce.Application.Services.Admin
             });
         }
 
-        // Returns
         public async Task<IEnumerable<ReturnRequestAdminDto>> GetReturnsAsync()
         {
             var returns = await _returnRepo.GetAllAsync();
@@ -160,13 +178,6 @@ namespace ECommerce.Application.Services.Admin
             request.Status = ReturnStatus.Rejected;
             request.UpdatedAt = DateTime.UtcNow;
             await _returnRepo.SaveChangesAsync();
-        }
-
-        // Helper for GetByIdAsync for seller profile
-        private async Task<SellerProfile?> GetSellerProfileByIdAsync(Guid id)
-        {
-            // We don't have this method, we'll add it to ISellerRepository.
-            throw new NotImplementedException();
         }
     }
 }

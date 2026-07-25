@@ -62,5 +62,18 @@ namespace ECommerce.Application.Services
                 Status = order.Payment.Status
             };
         }
+        public async Task<IEnumerable<PaymentAdminDto>> GetAllPaymentsAsync()
+        {
+            var payments = await _paymentRepo.GetAllAsync();
+            return payments.Select(p => new PaymentAdminDto
+            {
+                PaymentId = p.Id,
+                OrderId = p.ParentOrderId,
+                CustomerEmail = p.ParentOrder?.Customer?.Email ?? "Unknown",
+                Amount = p.Amount,
+                Status = p.Status,
+                Method = p.Method
+            });
+        }
     }
 }

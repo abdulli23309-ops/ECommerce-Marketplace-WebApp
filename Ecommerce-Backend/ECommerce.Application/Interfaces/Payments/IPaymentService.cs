@@ -6,5 +6,7 @@ namespace ECommerce.Application.Interfaces
     {
         Task<PaymentDto> MakePaymentAsync(Guid userId, MakePaymentDto dto);
         Task<PaymentDto?> GetPaymentStatusAsync(Guid userId, Guid orderId);
+        Task<IEnumerable<PaymentAdminDto>> GetAllPaymentsAsync();
+
     }
 }

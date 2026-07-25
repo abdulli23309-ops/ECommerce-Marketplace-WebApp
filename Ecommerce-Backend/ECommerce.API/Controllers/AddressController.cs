@@ -38,5 +38,14 @@ namespace ECommerce.API.Controllers
             if (!success) return NotFound();
             return NoContent();
         }
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateAddress(Guid id, CreateAddressDto dto)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _addressService.UpdateAddressAsync(userId, id, dto);
+            if (!result) return NotFound();
+            return NoContent();
+        }
     }
 }

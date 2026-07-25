@@ -1298,7 +1298,7 @@ namespace ECommerce.Infrastructure.Migrations
             modelBuilder.Entity("ECommerce.Domain.Entities.Shipment", b =>
                 {
                     b.HasOne("ECommerce.Domain.Entities.SellerOrder", "SellerOrder")
-                        .WithOne()
+                        .WithOne("Shipment")
                         .HasForeignKey("ECommerce.Domain.Entities.Shipment", "SellerOrderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -1421,6 +1421,8 @@ namespace ECommerce.Infrastructure.Migrations
             modelBuilder.Entity("ECommerce.Domain.Entities.SellerOrder", b =>
                 {
                     b.Navigation("OrderItems");
+
+                    b.Navigation("Shipment");
                 });
 
             modelBuilder.Entity("ECommerce.Domain.Entities.SellerProfile", b =>

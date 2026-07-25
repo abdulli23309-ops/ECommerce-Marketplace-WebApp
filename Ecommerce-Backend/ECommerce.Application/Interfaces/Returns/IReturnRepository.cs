@@ -10,6 +10,7 @@ namespace ECommerce.Application.Interfaces
         Task AddAsync(ReturnRequest returnRequest);
         Task<IEnumerable<ReturnRequest>> GetAllAsync();
         void Update(ReturnRequest returnRequest);
+        Task<int> GetPendingReturnsCountAsync();
         Task SaveChangesAsync();
     }
 }

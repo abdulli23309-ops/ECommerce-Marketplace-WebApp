@@ -8,5 +8,7 @@
         public decimal BasePrice { get; set; }
         public string Status { get; set; } = string.Empty;
         public List<string> Images { get; set; } = new();
+        public int StockQuantity { get; set; }
+        public Guid StoreId { get; set; }
     }
 }

@@ -12,7 +12,10 @@ namespace ECommerce.Application.Interfaces
         Task AddImageAsync(ProductImage image);
         Task<IEnumerable<Product>> GetAllAsync();
         Task<PagedResult<Product>> GetPagedAsync(int page, int pageSize);
-        
+        Task<Product?> GetByIdWithDetailsAsync(Guid productId);
+        Task<int> GetProductCountAsync();
+        Task<int> GetPendingProductCountAsync();
+
         Task SaveChangesAsync();
     }
 }

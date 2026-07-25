@@ -1,6 +1,7 @@
 ﻿using ECommerce.Application.DTOs.Admin;
 using ECommerce.Application.DTOs.Refunds;
 using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +14,13 @@ namespace ECommerce.API.Controllers
     {
         private readonly IAdminService _adminService;
         private readonly IRefundService _refundService;
+        private readonly IPaymentService _paymentService; 
 
-        public AdminController(IAdminService adminService, IRefundService refundService)
+        public AdminController(IAdminService adminService, IRefundService refundService, IPaymentService paymentService)
         {
             _adminService = adminService;
             _refundService = refundService;
+            _paymentService = paymentService;
         }
 
         // --- Sellers ---
@@ -81,6 +84,18 @@ namespace ECommerce.API.Controllers
         {
             var result = await _refundService.CreateRefundAsync(dto);
             return Ok(result);
+        }
+        [HttpGet("payments")]
+        public async Task<IActionResult> GetPayments()
+        {
+            var payments = await _paymentService.GetAllPaymentsAsync();
+            return Ok(payments);
+        }
+        [HttpGet("stats")]
+        public async Task<IActionResult> GetStats()
+        {
+            var stats = await _adminService.GetStatsAsync();
+            return Ok(stats);
         }
     }
 }

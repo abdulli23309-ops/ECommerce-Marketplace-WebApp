@@ -7,8 +7,7 @@ namespace ECommerce.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize(Roles = "SuperAdmin")] // Only admins can manage brands for now
-    [Authorize]
+    [Authorize(Roles = "SuperAdmin")] // Only admins can manage brands. Reads are opened back up below.
     public class BrandsController : ControllerBase
     {
         private readonly IBrandService _brandService;
