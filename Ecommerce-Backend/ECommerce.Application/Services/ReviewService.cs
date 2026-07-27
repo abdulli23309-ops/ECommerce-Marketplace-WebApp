@@ -95,6 +95,12 @@ namespace ECommerce.Application.Services.Reviews
             }
             return dtos;
         }
+        public async Task<ReviewDto?> GetReviewByIdAsync(Guid reviewId)
+        {
+            var review = await _reviewRepo.GetByIdAsync(reviewId);
+            if (review == null) return null;
+            return await MapToDto(review);
+        }
 
         private async Task<ReviewDto> MapToDto(Review review)
         {
@@ -104,6 +110,7 @@ namespace ECommerce.Application.Services.Reviews
             return new ReviewDto
             {
                 Id = review.Id,
+                OrderId = review.OrderItem?.SellerOrder?.ParentOrderId,
                 ProductId = review.ProductId ?? Guid.Empty,
                 ProductName = product?.Name ?? "Deleted Product",
                 UserName = user?.FullName ?? "Unknown User",

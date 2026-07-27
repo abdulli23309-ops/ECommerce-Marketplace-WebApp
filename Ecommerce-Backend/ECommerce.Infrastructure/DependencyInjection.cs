@@ -37,6 +37,7 @@ namespace ECommerce.Infrastructure
             services.AddScoped<IReviewRepository, ReviewRepository>();
             services.AddScoped<IReturnRepository, ReturnRepository>();
             services.AddScoped<IRefundRepository, RefundRepository>();
+            services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
             // Infrastructure-only services
             services.AddScoped<IPasswordHasherService, BCryptPasswordHasherService>();

@@ -24,7 +24,16 @@ import SellerPendingPage from "./pages/seller/SellerPendingPage";
 import SellerRegisterPage from "./pages/seller/SellerRegisterPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AddressBookPage from "./pages/customer/AddressBookPage";
-
+import ProductListingPage from "./pages/customer/ProductListingPage";
+import StoreSettingsPage from "./pages/seller/StoreSettingsPage";
+import StorePage from "./pages/customer/StorePage";
+import OrderDetailPage from "./pages/customer/OrderDetailPage";
+import SellerReviewsPage from "./pages/seller/SellerReviewsPage";
+import SellerDashboardPage from "./pages/seller/SellerDashboardPage";
+import ShipmentManagementPage from "./pages/seller/ShipmentManagementPage";
+import ReviewPage from "./pages/customer/ReviewPage";
+import MyReviewsPage from "./pages/customer/MyReviewsPage";
+import ReviewDetailPage from "./pages/customer/ReviewDetailPage";
 
 
 const App = () => {
@@ -54,8 +63,9 @@ const App = () => {
       */}
       <Route element={<CustomerLayout />}>
         <Route path="/" element={<HomePage />} />
-        <Route path="/products" element={<div>Products</div>} />
+       <Route path="/products" element={<ProductListingPage />} />
         <Route path="/products/:productId" element={<ProductDetailPage />} />
+        <Route path="/store/:storeId" element={<StorePage />} />
       </Route>
 
       {/* Customer routes that legitimately require an account – protected, allowed roles: Customer */}
@@ -66,18 +76,32 @@ const App = () => {
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/orders" element={<OrderHistoryPage />} />
           <Route path="/addresses" element={<AddressBookPage />} />
+          <Route path="/orders/:orderId" element={<OrderDetailPage />} />
+          <Route path="/review/new/:orderItemId" element={<ReviewPage />} />
+          <Route path="/reviews/my" element={<MyReviewsPage />} />
+          <Route path="/reviews/:reviewId" element={<ReviewDetailPage />} />
         </Route>
       </Route>
+      {/* Authenticated-only routes (any role) */}
+<Route element={<ProtectedRoute />}>   {/* no allowedRoles = any logged‑in user */}
+  <Route element={<CustomerLayout />}>
+    <Route path="/seller/register" element={<SellerRegisterPage />} />
+    <Route path="/seller/pending" element={<SellerPendingPage />} />
+  </Route>
+</Route>
 
      {/* Inside Seller routes */}
 <Route element={<ProtectedRoute allowedRoles={["Seller"]} />}>
   <Route element={<SellerLayout />}>
-    <Route path="/seller/dashboard" element={<div>Seller Dashboard (coming soon)</div>} />
+    <Route path="/seller/dashboard" element={<SellerDashboardPage />} />
     <Route path="/seller/products" element={<SellerProductsPage />} />
     <Route path="/seller/products/new" element={<ProductForm />} />
     <Route path="/seller/products/edit/:id" element={<ProductForm />} />
     <Route path="/seller/orders" element={<SellerOrdersPage />} />
     <Route path="/seller/register" element={<SellerRegisterPage />} />
+    <Route path="/seller/settings" element={<StoreSettingsPage />} />
+    <Route path="/seller/shipments" element={<ShipmentManagementPage />} />
+    <Route path="/seller/reviews" element={<SellerReviewsPage />} />
 <Route path="/seller/pending" element={<SellerPendingPage />} />
   </Route>
 </Route>

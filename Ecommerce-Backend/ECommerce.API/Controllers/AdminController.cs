@@ -34,12 +34,7 @@ namespace ECommerce.API.Controllers
             return NoContent();
         }
 
-        [HttpPut("sellers/{id}/reject")]
-        public async Task<IActionResult> RejectSeller(Guid id)
-        {
-            await _adminService.RejectSellerAsync(id);
-            return NoContent();
-        }
+        
 
         // --- Products ---
         [HttpGet("products")]
@@ -96,6 +91,12 @@ namespace ECommerce.API.Controllers
         {
             var stats = await _adminService.GetStatsAsync();
             return Ok(stats);
+        }
+        [HttpPut("sellers/{id}/reject")]
+        public async Task<IActionResult> RejectSeller(Guid id, [FromBody] string? reason = null)
+        {
+            await _adminService.RejectSellerAsync(id, reason);
+            return NoContent();
         }
     }
 }

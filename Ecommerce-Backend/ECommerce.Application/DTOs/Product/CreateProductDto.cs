@@ -5,6 +5,8 @@
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
         public decimal BasePrice { get; set; }
+        public int StockQuantity { get; set; }   // <-- add
         public Guid? SubCategoryId { get; set; }
+        public Guid? BrandId { get; set; }       // <-- add
     }
 }

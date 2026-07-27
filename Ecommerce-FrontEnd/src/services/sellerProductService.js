@@ -20,3 +20,15 @@ export const deleteProduct = async (productId) => {
   // backend may not support DELETE yet; we can use PUT to archive or just skip
   // we'll implement later if needed
 };
+export const uploadProductImage = async (productId, file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await axiosInstance.post(`/products/${productId}/images`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data; // ProductImageDto { id, imageUrl, sortOrder }
+};
+
+export const deleteProductImage = async (productId, imageId) => {
+  await axiosInstance.delete(`/products/${productId}/images/${imageId}`);
+};

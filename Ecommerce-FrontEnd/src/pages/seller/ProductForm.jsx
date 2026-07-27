@@ -3,10 +3,17 @@ import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchCategories, fetchSubCategories } from "../../services/categoryService";
 import { fetchBrands } from "../../services/brandService";
-import { createProduct, updateProduct, fetchSellerProducts } from "../../services/sellerProductService";
+import {
+  createProduct,
+  updateProduct,
+  fetchSellerProducts,
+  uploadProductImage,
+  deleteProductImage,
+} from "../../services/sellerProductService";
+import axiosInstance from "../../services/axiosInstance";
 
 const ProductForm = () => {
-  const { id } = useParams(); // if id exists, we're editing
+  const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
   const { register, handleSubmit, setValue, formState: { errors }, watch } = useForm();
@@ -16,6 +23,12 @@ const ProductForm = () => {
   const [brands, setBrands] = useState([]);
   const selectedCategoryId = watch("categoryId");
 
+  // Image states
+  const [existingImages, setExistingImages] = useState([]);
+  const [newFiles, setNewFiles] = useState([]);   // File objects selected for upload
+  const [uploading, setUploading] = useState(false);
+  const [imageError, setImageError] = useState(null);
+
   useEffect(() => {
     const loadFormData = async () => {
       const [cats, br] = await Promise.all([fetchCategories(), fetchBrands()]);
@@ -23,7 +36,6 @@ const ProductForm = () => {
       setBrands(br);
 
       if (isEdit) {
-        // Load product data to pre-fill form
         const products = await fetchSellerProducts();
         const product = products.find(p => p.id === id);
         if (product) {
@@ -31,9 +43,12 @@ const ProductForm = () => {
           setValue("description", product.description);
           setValue("basePrice", product.basePrice);
           setValue("stockQuantity", product.stockQuantity || 0);
-          setValue("subCategoryId", product.subCategoryId || "");
+          // Set category/subcategory if available
+          // (we may need to load subcategory->category mapping, but we'll skip for simplicity; the form currently expects categoryId separate)
           setValue("brandId", product.brandId || "");
-          // We need to set categoryId based on subCategoryId? The backend doesn't have a direct categoryId field on product. SubCategory belongs to Category, so we need to fetch subcategory to get its category. That's complex. For simplicity, we'll skip category pre-selection or we can load subcategory then set category. We'll just leave category dropdown empty, but we'll populate subcategories based on selected category.
+
+          // Load existing images
+          setExistingImages(product.images || []);
         }
       }
     };
@@ -59,21 +74,51 @@ const ProductForm = () => {
         stockQuantity: parseInt(data.stockQuantity) || 0,
         subCategoryId: data.subCategoryId || null,
         brandId: data.brandId || null,
-        // imageUrls? not in this form, we can add later
       };
 
+      let productId = id;
       if (isEdit) {
-        await updateProduct(id, payload);
+        await updateProduct(productId, payload);
       } else {
-        await createProduct(payload);
+        const newProduct = await createProduct(payload);
+        productId = newProduct.id;
       }
+
+      // Upload any selected new files
+      if (newFiles.length > 0 && productId) {
+        setUploading(true);
+        for (const file of newFiles) {
+          await uploadProductImage(productId, file);
+        }
+        setUploading(false);
+      }
+
       navigate("/seller/products");
     } catch (err) {
       console.error("Failed to save product", err);
-    } finally {
       setLoading(false);
+      setUploading(false);
     }
   };
+
+  const handleDeleteImage = async (imageId) => {
+    if (!window.confirm("Delete this image?")) return;
+    try {
+      await deleteProductImage(id, imageId);
+      setExistingImages(prev => prev.filter(img => img.id !== imageId));
+    } catch (err) {
+      console.error("Failed to delete image", err);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    // Validate file size/type? Backend does it, but we can show error earlier.
+    setNewFiles(files);
+    setImageError(null);
+  };
+
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/api$/, ''); // remove trailing /api to get root URL
 
   return (
     <div>
@@ -94,9 +139,14 @@ const ProductForm = () => {
           {errors.basePrice && <p className="error-text">Valid price is required</p>}
         </div>
         <div className="form-group">
-          <label className="form-label">Stock Quantity</label>
-          <input type="number" className="form-input" {...register("stockQuantity", { valueAsNumber: true })} />
-        </div>
+  <label className="form-label">Stock Quantity</label>
+  <input
+    type="number"
+    className="form-input"
+    {...register("stockQuantity", { required: true, valueAsNumber: true, min: 0 })}
+  />
+  {errors.stockQuantity && <p className="error-text">Stock quantity is required</p>}
+</div>
         <div className="form-group">
           <label className="form-label">Category</label>
           <select className="form-input" {...register("categoryId")} defaultValue="">
@@ -124,8 +174,41 @@ const ProductForm = () => {
             ))}
           </select>
         </div>
-        <button type="submit" className="btn-primary" disabled={loading}>
-          {loading ? "Saving..." : (isEdit ? "Update Product" : "Create Product")}
+
+        {/* Existing Images (edit mode) */}
+        {isEdit && existingImages.length > 0 && (
+          <div className="form-group">
+            <label className="form-label">Current Images</label>
+            <div className="image-gallery">
+              {existingImages.map(img => (
+                <div key={img.id} className="image-thumb">
+                  <img src={`${apiBaseUrl}${img.imageUrl}`} alt="Product" />
+                  <button type="button" className="btn-remove" onClick={() => handleDeleteImage(img.id)}>Remove</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* New Image Upload */}
+        <div className="form-group">
+          <label className="form-label">{isEdit ? "Add More Images" : "Product Images"}</label>
+          <input type="file" multiple accept=".jpg,.jpeg,.png,.webp" onChange={handleFileChange} />
+          {newFiles.length > 0 && (
+            <div className="new-files-preview">
+              {newFiles.map((file, index) => (
+                <div key={index} className="file-preview">
+                  <img src={URL.createObjectURL(file)} alt="Preview" />
+                  <span>{file.name}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {imageError && <p className="error-text">{imageError}</p>}
+        </div>
+
+        <button type="submit" className="btn-primary" disabled={loading || uploading}>
+          {loading || uploading ? (uploading ? "Uploading images..." : "Saving...") : (isEdit ? "Update Product" : "Create Product")}
         </button>
       </form>
     </div>

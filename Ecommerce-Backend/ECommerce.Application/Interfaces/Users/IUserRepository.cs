@@ -9,6 +9,7 @@ namespace ECommerce.Application.Interfaces
         Task AddAsync(User user);
         void Update(User user);
         Task SaveChangesAsync();
+        Task AddUserRoleAsync(Guid userId, string roleName);
         Task<User?> GetByRefreshTokenAsync(string refreshToken);
         Task<int> GetUserCountAsync();
         Task<IList<string>> GetUserRolesAsync(Guid userId);

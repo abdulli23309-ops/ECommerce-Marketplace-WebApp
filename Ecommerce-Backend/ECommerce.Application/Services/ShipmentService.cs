@@ -62,10 +62,12 @@ namespace ECommerce.Application.Services.Orders
 
             await EnsureCallerOwnsSellerOrderAsync(shipment.SellerOrderId, callerUserId, isAdmin);
 
+            // Update shipment
             shipment.Status = dto.Status;
             shipment.UpdatedAt = DateTime.UtcNow;
             _repo.Update(shipment);
 
+            // Add tracking history
             var history = new ShipmentTrackingHistory
             {
                 ShipmentId = shipment.Id,
@@ -74,11 +76,45 @@ namespace ECommerce.Application.Services.Orders
                 Timestamp = DateTime.UtcNow
             };
             await _repo.AddTrackingHistoryAsync(history);
+
+            // --- NEW: Update the seller order status based on shipment status ---
+            var sellerOrder = await _orderRepo.GetSellerOrderByIdAsync(shipment.SellerOrderId); // need to add GetByIdAsync if not present
+            if (sellerOrder != null)
+            {
+                // Map shipment status to seller order status
+                sellerOrder.Status = dto.Status switch
+                {
+                    "Packed" => "Packed",
+                    "Dispatched" => "Dispatched",
+                    "OutForDelivery" => "OutForDelivery",
+                    "Delivered" => "Delivered",
+                    _ => sellerOrder.Status
+                };
+                sellerOrder.UpdatedAt = DateTime.UtcNow;
+                // We'll need to update the seller order via repository; we can add an Update method to IOrderRepository
+                _orderRepo.UpdateSellerOrder(sellerOrder);   // add this method
+
+                // If the status is Delivered, check if all seller orders under the parent are delivered, then update parent order
+                if (dto.Status == "Delivered")
+                {
+                    var parentOrder = await _orderRepo.GetParentOrderByIdAsync(sellerOrder.ParentOrderId); // add method
+                    if (parentOrder != null)
+                    {
+                        bool allDelivered = parentOrder.SellerOrders.All(so => so.Status == "Delivered");
+                        if (allDelivered)
+                        {
+                            parentOrder.OrderStatus = "Delivered";
+                            parentOrder.UpdatedAt = DateTime.UtcNow;
+                            _orderRepo.UpdateParentOrder(parentOrder);
+                        }
+                    }
+                }
+            }
+
             await _repo.SaveChangesAsync();
 
             return MapToDto(shipment);
         }
-
         public async Task<ShipmentDto?> GetShipmentByOrderAsync(Guid sellerOrderId)
         {
             var shipment = await _repo.GetBySellerOrderIdAsync(sellerOrderId);

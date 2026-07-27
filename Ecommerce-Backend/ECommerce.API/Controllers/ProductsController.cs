@@ -32,10 +32,19 @@ namespace ECommerce.API.Controllers
         [HttpGet("all")]
         [AllowAnonymous]
         public async Task<IActionResult> GetPagedProducts(
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10,
+    [FromQuery] Guid? categoryId = null,
+    [FromQuery] Guid? subCategoryId = null,
+    [FromQuery] Guid? brandId = null,
+    [FromQuery] decimal? minPrice = null,
+    [FromQuery] decimal? maxPrice = null,
+    [FromQuery] string? search = null,
+    [FromQuery] string? sortBy = null)
         {
-            var result = await _productService.GetPagedProductsAsync(page, pageSize);
+            var result = await _productService.GetPagedProductsAsync(
+                page, pageSize, categoryId, subCategoryId, brandId,
+                minPrice, maxPrice, search, sortBy);
             return Ok(result);
         }
 
@@ -84,6 +93,42 @@ namespace ECommerce.API.Controllers
             {
                 var deleted = await _productService.DeleteProductAsync(GetUserId(), id);
                 if (!deleted) return NotFound();
+                return NoContent();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
+            }
+        }
+        [HttpPost("{id}/images")]
+        [Authorize(Roles = "Seller")]
+        public async Task<IActionResult> UploadImage(Guid id, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file provided.");
+
+            try
+            {
+                var result = await _productService.UploadProductImageAsync(GetUserId(), id, file.OpenReadStream(), file.FileName);
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("{id}/images/{imageId}")]
+        [Authorize(Roles = "Seller")]
+        public async Task<IActionResult> DeleteImage(Guid id, Guid imageId)
+        {
+            try
+            {
+                await _productService.DeleteProductImageAsync(GetUserId(), id, imageId);
                 return NoContent();
             }
             catch (UnauthorizedAccessException ex)

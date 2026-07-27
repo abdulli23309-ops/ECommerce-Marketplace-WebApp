@@ -9,3 +9,7 @@ export const fetchOrders = async () => {
   const response = await axiosInstance.get("/orders");
   return response.data; // array of ParentOrderDto
 };
+export const fetchOrderById = async (orderId) => {
+  const response = await axiosInstance.get(`/orders/${orderId}`);
+  return response.data;
+};

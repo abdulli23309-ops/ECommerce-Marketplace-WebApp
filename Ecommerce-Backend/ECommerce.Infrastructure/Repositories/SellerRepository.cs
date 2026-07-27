@@ -36,6 +36,10 @@ namespace ECommerce.Infrastructure.Repositories
         public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
         public async Task<int> GetSellerCountAsync()
     => await _context.SellerProfiles.CountAsync();
+        public async Task<Store?> GetStoreByIdAsync(Guid storeId)
+    => await _context.Stores
+        .Include(s => s.SellerProfile)
+        .FirstOrDefaultAsync(s => s.Id == storeId && !s.IsDeleted);
 
         public async Task<int> GetPendingSellerCountAsync()
             => await _context.SellerProfiles.CountAsync(sp => sp.Status == "Pending");

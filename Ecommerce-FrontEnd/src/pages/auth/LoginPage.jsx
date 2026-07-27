@@ -11,38 +11,39 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
-    try {
-      const result = await loginUser(data.email, data.password);
-      if (!result.succeeded) {
-        setError("root", { message: result.message || "Login failed" });
-        return;
-      }
-
-      const decoded = jwtDecode(result.accessToken);
-      let roles = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
-      if (!roles) roles = [];
-      if (!Array.isArray(roles)) roles = [roles];
-
-      const user = {
-        id: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"],
-        email: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
-        fullName: decoded["fullName"],
-        roles,
-      };
-
-      dispatch(setCredentials({ user, accessToken: result.accessToken, refreshToken: result.refreshToken }));
-
-      if (roles.includes("SuperAdmin")) {
-        navigate("/admin/dashboard");
-      } else if (roles.includes("Seller")) {
-        navigate("/seller/dashboard");
-      } else {
-        navigate("/");
-      }
-    } catch (err) {
-      setError("root", { message: "Network error. Please try again." });
+  try {
+    const result = await loginUser(data.email, data.password);
+    if (!result.succeeded) {
+      setError("root", { message: result.message || "Login failed" });
+      return;
     }
-  };
+
+    const decoded = jwtDecode(result.accessToken);
+    let roles = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+    if (!roles) roles = [];
+    if (!Array.isArray(roles)) roles = [roles];
+
+    const user = {
+      id: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"],
+      email: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
+      fullName: decoded["fullName"],
+      roles,
+    };
+
+    dispatch(setCredentials({ user, accessToken: result.accessToken, refreshToken: result.refreshToken }));
+
+    // 🔁 Role‑based redirect – priority order: Admin > Seller > Customer
+    if (roles.includes("SuperAdmin")) {
+      navigate("/admin/dashboard");
+    } else if (roles.includes("Seller")) {
+      navigate("/seller/products");   // ← send seller to their product list
+    } else {
+      navigate("/");                   // Customer or undefined → home page
+    }
+  } catch (err) {
+    setError("root", { message: "Network error. Please try again." });
+  }
+};
 
   return (
     <div>

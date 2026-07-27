@@ -6,8 +6,8 @@ using ECommerce.Application.Services.Orders;
 using ECommerce.Application.Services.Refunds;
 using ECommerce.Application.Services.Returns;
 using ECommerce.Application.Services.Reviews;
-using Microsoft.Extensions.DependencyInjection;
 using ECommerce.Application.Services.Seller;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ECommerce.Application
 {

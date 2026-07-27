@@ -39,6 +39,15 @@ namespace ECommerce.Infrastructure.Repositories
                 .ToListAsync();
         public async Task<int> GetOrderCountAsync()
     => await _context.ParentOrders.CountAsync();
+        public async Task<ParentOrder?> GetOrderByIdForUserAsync(Guid parentOrderId, Guid userId)
+    => await _context.ParentOrders
+        .Include(po => po.SellerOrders)
+            .ThenInclude(so => so.OrderItems)
+        .Include(po => po.SellerOrders)
+            .ThenInclude(so => so.Shipment)
+                .ThenInclude(s => s!.TrackingHistories)
+        .Include(po => po.Payment)
+        .FirstOrDefaultAsync(po => po.Id == parentOrderId && po.CustomerId == userId);
 
         public async Task<OrderItem?> GetOrderItemByIdAsync(Guid orderItemId)
             => await _context.OrderItems
@@ -54,6 +63,19 @@ namespace ECommerce.Infrastructure.Repositories
                     .ThenInclude(s => s!.TrackingHistories)
                 .Where(so => so.StoreId == storeId)
                 .ToListAsync();
+        public async Task<SellerOrder?> GetSellerOrderByIdAsync(Guid sellerOrderId)
+    => await _context.SellerOrders.FindAsync(sellerOrderId);
+
+        public void UpdateSellerOrder(SellerOrder order)
+            => _context.SellerOrders.Update(order);
+
+        public async Task<ParentOrder?> GetParentOrderByIdAsync(Guid parentOrderId)
+            => await _context.ParentOrders
+                .Include(po => po.SellerOrders)
+                .FirstOrDefaultAsync(po => po.Id == parentOrderId);
+
+        public void UpdateParentOrder(ParentOrder order)
+            => _context.ParentOrders.Update(order);
 
         public async Task<Guid?> GetStoreIdBySellerOrderIdAsync(Guid sellerOrderId)
             => await _context.SellerOrders

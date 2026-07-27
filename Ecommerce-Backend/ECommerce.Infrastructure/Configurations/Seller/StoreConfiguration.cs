@@ -15,6 +15,7 @@ namespace ECommerce.Infrastructure.Data.Configurations.Seller
             builder.Property(s => s.Description).HasMaxLength(1000);
             builder.Property(s => s.IsActive).IsRequired().HasDefaultValue(true);
             builder.Property(s => s.IsDeleted).IsRequired().HasDefaultValue(false);
+            builder.Property(s => s.LogoUrl).HasMaxLength(500);
             builder.Property(s => s.CreatedAt).IsRequired().HasDefaultValueSql("SYSUTCDATETIME()");
 
             builder.HasOne(s => s.SellerProfile)

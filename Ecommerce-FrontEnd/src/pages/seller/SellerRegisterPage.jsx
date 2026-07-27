@@ -1,33 +1,123 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../services/axiosInstance";
+
 const SellerRegisterPage = () => {
   const navigate = useNavigate();
+  const [status, setStatus] = useState(null);          // null=loading, 'None'=no profile
+  const [rejectionReason, setRejectionReason] = useState("");
   const [step, setStep] = useState(1);
   const [profile, setProfile] = useState({ businessName: "", description: "" });
-  const [store, setStore] = useState({ name: "", description: "" });
+  const [store, setStore] = useState({ name: "", description: "", logoUrl: "" });
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [logoPreview, setLogoPreview] = useState(null);
 
+  // 1. Check seller status on mount
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const res = await axiosInstance.get("/seller/status");
+        const data = res.data;
+        if (!data.hasProfile) {
+          setStatus("None");
+        } else {
+          setStatus(data.status);               // "Pending", "Approved", "Rejected"
+          setRejectionReason(data.rejectionReason || "");
+          if (data.status === "Approved") {
+            navigate("/seller/products", { replace: true });
+          }
+        }
+      } catch (err) {
+        setError("Unable to load seller status.");
+      }
+    };
+    fetchStatus();
+  }, [navigate]);
+
+  // 2. Handlers for the wizard
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
     try {
       await axiosInstance.post("/seller/profile", profile);
       setStep(2);
     } catch (err) {
       setError("Failed to create profile. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleStoreSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
     try {
+      // If storeId exists we are updating, otherwise creating
+      // For simplicity we only allow creation here; editing uses the edit profile page later.
       await axiosInstance.post("/seller/store", store);
-      navigate("/seller/pending");
+      setStatus("Pending");   // immediately show "submitted" view
     } catch (err) {
       setError("Failed to create store. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleLogoChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploadingLogo(true);
+    setError(null);
+    setLogoPreview(URL.createObjectURL(file));
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await axiosInstance.post("/seller/store/logo", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setStore({ ...store, logoUrl: res.data.logoUrl });
+    } catch (err) {
+      setError("Failed to upload logo. Please try again.");
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  // 3. Render based on status
+  if (status === null) {
+    return <div style={{ padding: "2rem", textAlign: "center", color: "#666" }}>Loading...</div>;
+  }
+
+  // --- PENDING ---
+  if (status === "Pending") {
+    return (
+      <div style={{ maxWidth: "600px", margin: "2rem auto", padding: "2rem", textAlign: "center" }}>
+        <h2 className="section-title">Application Submitted</h2>
+        <p>Your seller application is under review. You'll be notified once it's processed.</p>
+      </div>
+    );
+  }
+
+  // --- REJECTED ---
+  if (status === "Rejected") {
+    return (
+      <div style={{ maxWidth: "600px", margin: "2rem auto", padding: "2rem" }}>
+        <h2 className="section-title">Application Rejected</h2>
+        <div style={{ background: "#fff", border: "1px solid #eaeaea", borderRadius: "0.5rem", padding: "1.5rem", marginTop: "1rem" }}>
+          <p style={{ fontWeight: 600, color: "#000" }}>Reason:</p>
+          <p style={{ color: "#666", marginBottom: "1rem" }}>{rejectionReason || "No reason provided."}</p>
+          <p style={{ color: "#666", marginBottom: "1.5rem" }}>You can edit your details and re‑submit for approval.</p>
+          <button className="btn-primary" onClick={() => { setStatus("None"); setStep(1); }}>Edit & Resubmit</button>
+        </div>
+      </div>
+    );
+  }
+
+  // --- NO PROFILE (or after clicking "Edit & Resubmit") — show wizard ---
   return (
     <div style={{ maxWidth: "600px", margin: "2rem auto", padding: "2rem" }}>
       <h2 className="section-title">Become a Seller</h2>
@@ -52,9 +142,12 @@ const SellerRegisterPage = () => {
             />
           </div>
           {error && <p className="error-text">{error}</p>}
-          <button type="submit" className="btn-primary">Next</button>
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? "Saving..." : "Next"}
+          </button>
         </form>
       )}
+
       {step === 2 && (
         <form onSubmit={handleStoreSubmit}>
           <h3>Step 2: Your Store</h3>
@@ -75,8 +168,30 @@ const SellerRegisterPage = () => {
               onChange={(e) => setStore({ ...store, description: e.target.value })}
             />
           </div>
+          {/* Logo Upload */}
+          <div className="form-group">
+            <label className="form-label">Store Logo</label>
+            <input
+              type="file"
+              accept=".jpg,.jpeg,.png,.webp"
+              onChange={handleLogoChange}
+              style={{ marginBottom: "0.5rem" }}
+            />
+            {uploadingLogo && <p style={{ color: "#666" }}>Uploading logo...</p>}
+            {logoPreview && (
+              <div style={{ marginTop: "0.5rem" }}>
+                <img
+                  src={logoPreview}
+                  alt="Logo preview"
+                  style={{ width: "100px", height: "100px", objectFit: "cover", border: "1px solid #eaeaea", borderRadius: "0.25rem" }}
+                />
+              </div>
+            )}
+          </div>
           {error && <p className="error-text">{error}</p>}
-          <button type="submit" className="btn-primary">Submit</button>
+          <button type="submit" className="btn-primary" disabled={loading || uploadingLogo}>
+            {loading ? "Saving..." : "Submit for Review"}
+          </button>
         </form>
       )}
     </div>

@@ -6,6 +6,7 @@ namespace ECommerce.Application.Interfaces
     {
         Task<ReviewDto> CreateReviewAsync(Guid userId, CreateReviewDto dto);
         Task<IEnumerable<ReviewDto>> GetProductReviewsAsync(Guid productId);
+        Task<ReviewDto?> GetReviewByIdAsync(Guid reviewId);
         Task<IEnumerable<ReviewDto>> GetMyReviewsAsync(Guid userId);
     }
 }

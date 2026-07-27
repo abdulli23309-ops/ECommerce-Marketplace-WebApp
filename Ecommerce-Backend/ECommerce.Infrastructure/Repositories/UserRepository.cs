@@ -53,5 +53,14 @@ namespace ECommerce.Infrastructure.Repositories
                 .Select(ur => ur.Role.Name)
                 .ToListAsync();
         }
+        public async Task AddUserRoleAsync(Guid userId, string roleName)
+        {
+            var role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == roleName)
+                       ?? throw new InvalidOperationException($"Role '{roleName}' not found.");
+            if (!await _context.UserRoles.AnyAsync(ur => ur.UserId == userId && ur.RoleId == role.Id))
+            {
+                _context.UserRoles.Add(new UserRole { UserId = userId, RoleId = role.Id });
+            }
+        }
     }
 }

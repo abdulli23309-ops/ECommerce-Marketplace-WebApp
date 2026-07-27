@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { fetchApprovedProducts } from "../../services/productService";
+import { getImageUrl } from "../../utils/imageHelper";
 
 const HomePage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await fetchApprovedProducts(1, 8);
+        const data = await fetchApprovedProducts({ page: 1, pageSize: 8 });
         setProducts(data.items || []);
       } catch (err) {
         console.error("Failed to load products", err);
@@ -20,16 +23,29 @@ const HomePage = () => {
     load();
   }, []);
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const trimmed = searchTerm.trim();
+    if (trimmed) {
+      navigate(`/products?search=${encodeURIComponent(trimmed)}`);
+    }
+  };
+
   return (
     <div>
       {/* Hero Banner */}
       <section className="hero-banner">
         <h2 className="hero-title">Elevate Your Essentials.</h2>
         <p className="hero-subtitle">Discover premium products from verified sellers.</p>
-        <div className="hero-search">
-          <input type="text" placeholder="Search for products..." />
-          <button>Search</button>
-        </div>
+        <form className="hero-search" onSubmit={handleSearch}>
+          <input
+            type="text"
+            placeholder="Search for products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <button type="submit">Search</button>
+        </form>
       </section>
 
       {/* Featured Products */}
@@ -51,7 +67,7 @@ const HomePage = () => {
                 <div style={{ backgroundColor: '#f9fafb', height: '260px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {product.images && product.images.length > 0 ? (
                     <img
-                      src={product.images[0]}
+                      src={getImageUrl(product.images[0])}
                       alt={product.name}
                       className="product-image"
                     />

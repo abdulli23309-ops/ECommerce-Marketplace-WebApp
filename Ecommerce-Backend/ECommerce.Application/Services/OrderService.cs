@@ -104,41 +104,7 @@ namespace ECommerce.Application.Services
         public async Task<IEnumerable<ParentOrderDto>> GetMyOrdersAsync(Guid userId)
         {
             var orders = await _orderRepo.GetOrdersByUserIdAsync(userId);
-            return orders.Select(po => new ParentOrderDto
-            {
-                ParentOrderId = po.Id,
-                OrderDate = po.OrderDate,
-                OrderStatus = po.OrderStatus,
-                TotalAmount = po.TotalAmount,
-                SellerOrders = po.SellerOrders.Select(so => new SellerOrderDto
-                {
-                    SellerOrderId = so.Id,
-                    StoreName = so.Store?.Name ?? "Deleted Store",
-                    SubTotal = so.SubTotal,
-                    Status = so.Status,
-                    Items = so.OrderItems.Select(oi => new OrderItemDto
-                    {
-                        ProductName = oi.ProductNameSnapshot,
-                        UnitPrice = oi.UnitPriceSnapshot,
-                        Quantity = oi.Quantity
-                    }).ToList(),
-                    Shipment = so.Shipment == null ? null : new ShipmentDto
-                    {
-                        ShipmentId = so.Shipment.Id,
-                        SellerOrderId = so.Shipment.SellerOrderId,
-                        TrackingNumber = so.Shipment.TrackingNumber,
-                        Carrier = so.Shipment.Carrier,
-                        Status = so.Shipment.Status,
-                        TrackingHistory = so.Shipment.TrackingHistories?.Select(th =>
-                            new ShipmentTrackingHistoryDto
-                            {
-                                Status = th.Status,
-                                Location = th.Location,
-                                Timestamp = th.Timestamp
-                            }).ToList() ?? new List<ShipmentTrackingHistoryDto>()
-                    }
-                }).ToList()
-            });
+            return orders.Select(MapToDto);
         }
 
         public async Task<IEnumerable<ParentOrderDto>> GetSellerOrdersAsync(Guid userId)
@@ -191,6 +157,52 @@ namespace ECommerce.Application.Services
                 .ToList();
 
             return parentOrders;
+        }
+
+        public async Task<ParentOrderDto?> GetOrderByIdAsync(Guid userId, Guid parentOrderId)
+        {
+            var order = await _orderRepo.GetOrderByIdForUserAsync(parentOrderId, userId);
+            return order == null ? null : MapToDto(order);
+        }
+
+        private ParentOrderDto MapToDto(ParentOrder order)
+        {
+            return new ParentOrderDto
+            {
+                ParentOrderId = order.Id,
+                OrderDate = order.OrderDate,
+                OrderStatus = order.OrderStatus,
+                TotalAmount = order.TotalAmount,
+                SellerOrders = order.SellerOrders.Select(so => new SellerOrderDto
+                {
+                    SellerOrderId = so.Id,
+                    StoreName = so.Store?.Name ?? "Deleted Store",
+                    SubTotal = so.SubTotal,
+                    Status = so.Status,
+                    Items = so.OrderItems.Select(oi => new OrderItemDto
+                    {
+                        OrderItemId = oi.Id,
+                        ProductName = oi.ProductNameSnapshot,
+                        UnitPrice = oi.UnitPriceSnapshot,
+                        Quantity = oi.Quantity
+                    }).ToList(),
+                    Shipment = so.Shipment == null ? null : new ShipmentDto
+                    {
+                        ShipmentId = so.Shipment.Id,
+                        SellerOrderId = so.Shipment.SellerOrderId,
+                        TrackingNumber = so.Shipment.TrackingNumber,
+                        Carrier = so.Shipment.Carrier,
+                        Status = so.Shipment.Status,
+                        TrackingHistory = so.Shipment.TrackingHistories?.Select(th =>
+                            new ShipmentTrackingHistoryDto
+                            {
+                                Status = th.Status,
+                                Location = th.Location,
+                                Timestamp = th.Timestamp
+                            }).ToList() ?? new List<ShipmentTrackingHistoryDto>()
+                    }
+                }).ToList()
+            };
         }
     }
 }

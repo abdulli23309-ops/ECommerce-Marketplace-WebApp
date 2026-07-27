@@ -15,6 +15,7 @@ namespace ECommerce.Infrastructure.Data.Configurations.Seller
             builder.Property(sp => sp.Description).HasMaxLength(1000);
             builder.Property(sp => sp.Status).IsRequired().HasMaxLength(50).HasDefaultValue("Pending");
             builder.Property(sp => sp.CreatedAt).IsRequired().HasDefaultValueSql("SYSUTCDATETIME()");
+            builder.Property(sp => sp.RejectionReason).HasMaxLength(1000);
 
             builder.HasOne(sp => sp.User)
                    .WithOne(u => u.SellerProfile)

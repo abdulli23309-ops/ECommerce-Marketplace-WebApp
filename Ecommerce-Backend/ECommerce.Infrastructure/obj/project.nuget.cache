@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "ivU72DgUGX4=",
+  "dgSpecHash": "8j/7E+GfEl0=",
   "success": true,
   "projectFilePath": "E:\\Internship\\Project3\\Ecommerce-WebApp\\Ecommerce-Backend\\ECommerce.Infrastructure\\ECommerce.Infrastructure.csproj",
   "expectedPackageFiles": [
@@ -40,6 +40,8 @@
     "C:\\Users\\Dell5420\\.nuget\\packages\\microsoft.extensions.dependencymodel\\10.0.10\\microsoft.extensions.dependencymodel.10.0.10.nupkg.sha512",
     "C:\\Users\\Dell5420\\.nuget\\packages\\microsoft.extensions.diagnostics\\10.0.10\\microsoft.extensions.diagnostics.10.0.10.nupkg.sha512",
     "C:\\Users\\Dell5420\\.nuget\\packages\\microsoft.extensions.diagnostics.abstractions\\10.0.10\\microsoft.extensions.diagnostics.abstractions.10.0.10.nupkg.sha512",
+    "C:\\Users\\Dell5420\\.nuget\\packages\\microsoft.extensions.fileproviders.abstractions\\10.0.10\\microsoft.extensions.fileproviders.abstractions.10.0.10.nupkg.sha512",
+    "C:\\Users\\Dell5420\\.nuget\\packages\\microsoft.extensions.hosting.abstractions\\10.0.10\\microsoft.extensions.hosting.abstractions.10.0.10.nupkg.sha512",
     "C:\\Users\\Dell5420\\.nuget\\packages\\microsoft.extensions.identity.core\\10.0.10\\microsoft.extensions.identity.core.10.0.10.nupkg.sha512",
     "C:\\Users\\Dell5420\\.nuget\\packages\\microsoft.extensions.identity.stores\\10.0.10\\microsoft.extensions.identity.stores.10.0.10.nupkg.sha512",
     "C:\\Users\\Dell5420\\.nuget\\packages\\microsoft.extensions.logging\\10.0.10\\microsoft.extensions.logging.10.0.10.nupkg.sha512",

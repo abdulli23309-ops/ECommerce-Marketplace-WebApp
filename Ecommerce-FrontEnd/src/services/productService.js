@@ -1,12 +1,21 @@
 import axiosInstance from "./axiosInstance";
 
-export const fetchApprovedProducts = async (page = 1, pageSize = 8) => {
+export const fetchApprovedProducts = async (params = {}) => {
   const response = await axiosInstance.get("/products/all", {
-    params: { page, pageSize },
+    params: {
+      page: params.page || 1,
+      pageSize: params.pageSize || 12,
+      categoryId: params.categoryId || undefined,
+      subCategoryId: params.subCategoryId || undefined,
+      brandId: params.brandId || undefined,
+      minPrice: params.minPrice || undefined,
+      maxPrice: params.maxPrice || undefined,
+      search: params.search || undefined,
+      sortBy: params.sortBy || undefined,
+    },
   });
-  return response.data; // { items, totalCount, page, pageSize, totalPages }
+  return response.data;
 };
-
 export const fetchProductById = async (productId) => {
   const response = await axiosInstance.get(`/products/${productId}`);
   return response.data;

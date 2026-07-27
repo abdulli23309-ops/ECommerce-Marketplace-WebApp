@@ -32,5 +32,9 @@ namespace ECommerce.Infrastructure.Repositories.Orders
         .FirstOrDefaultAsync(s => s.Id == shipmentId);
         public async Task<IEnumerable<Shipment>> GetAllAsync()
     => await _context.Shipments.ToListAsync();
+        public async Task<int> GetPendingShipmentsCountByStoreIdAsync(Guid storeId)
+    => await _context.Shipments
+        .Where(s => s.SellerOrder.StoreId == storeId && s.Status != "Delivered")
+        .CountAsync();
     }
 }

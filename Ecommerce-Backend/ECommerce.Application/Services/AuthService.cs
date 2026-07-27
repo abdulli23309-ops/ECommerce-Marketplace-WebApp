@@ -35,6 +35,7 @@ namespace ECommerce.Application.Services
             };
 
             await _userRepo.AddAsync(user);
+            await _userRepo.AddUserRoleAsync(user.Id, "Customer");
             await _userRepo.SaveChangesAsync();
 
             return new AuthResponseDto { Succeeded = true, Message = "Registration successful." };

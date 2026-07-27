@@ -8,7 +8,6 @@ namespace ECommerce.Application.Interfaces
         // Sellers
         Task<IEnumerable<SellerAdminDto>> GetSellersAsync();
         Task ApproveSellerAsync(Guid sellerId);
-        Task RejectSellerAsync(Guid sellerId);
 
         // Products
         Task<IEnumerable<ProductAdminDto>> GetProductsAsync();
@@ -20,8 +19,10 @@ namespace ECommerce.Application.Interfaces
 
         // Returns
         Task<IEnumerable<ReturnRequestAdminDto>> GetReturnsAsync();
+        Task RejectSellerAsync(Guid sellerId, string? reason);
         Task ApproveReturnAsync(Guid returnId);
         Task RejectReturnAsync(Guid returnId);
+
         Task<AdminStatsDto> GetStatsAsync();
 
         // Refunds (existing service used directly in controller)

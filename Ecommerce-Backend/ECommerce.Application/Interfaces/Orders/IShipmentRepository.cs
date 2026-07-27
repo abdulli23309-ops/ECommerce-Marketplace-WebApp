@@ -10,6 +10,7 @@ namespace ECommerce.Application.Interfaces
         Task AddTrackingHistoryAsync(ShipmentTrackingHistory history);
         Task SaveChangesAsync();
         Task<Shipment?> GetByIdAsync(Guid shipmentId);
+        Task<int> GetPendingShipmentsCountByStoreIdAsync(Guid storeId);
         Task<IEnumerable<Shipment>> GetAllAsync();
     }
 }

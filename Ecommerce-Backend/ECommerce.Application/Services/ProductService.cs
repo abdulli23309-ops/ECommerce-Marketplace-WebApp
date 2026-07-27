@@ -9,16 +9,18 @@ namespace ECommerce.Application.Services.Catalog
     {
         private readonly IProductRepository _productRepo;
         private readonly ISellerRepository _sellerRepo;
+        private readonly IFileStorageService _fileStorageService;
         private readonly IReviewRepository _reviewRepo;   // added for rating data
 
         public ProductService(
             IProductRepository productRepo,
             ISellerRepository sellerRepo,
-            IReviewRepository reviewRepo)
+            IReviewRepository reviewRepo, IFileStorageService fileStorageService)
         {
             _productRepo = productRepo;
             _sellerRepo = sellerRepo;
             _reviewRepo = reviewRepo;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<IEnumerable<ProductDto>> GetStoreProductsAsync(Guid userId)
@@ -36,6 +38,8 @@ namespace ECommerce.Application.Services.Catalog
                 Name = p.Name,
                 Description = p.Description,
                 BasePrice = p.BasePrice,
+                StockQuantity = p.StockQuantity,   
+                StoreId = p.StoreId,
                 Status = p.Status,
                 Images = p.ProductImages.Select(i => i.ImageUrl).ToList()
             });
@@ -54,7 +58,9 @@ namespace ECommerce.Application.Services.Catalog
                 Name = dto.Name,
                 Description = dto.Description,
                 BasePrice = dto.BasePrice,
+                StockQuantity = dto.StockQuantity,       // <-- add
                 SubCategoryId = dto.SubCategoryId,
+                BrandId = dto.BrandId,                   // <-- add
                 Status = "PendingApproval",
                 CreatedAt = DateTime.UtcNow
             };
@@ -68,27 +74,38 @@ namespace ECommerce.Application.Services.Catalog
                 Name = product.Name,
                 Description = product.Description,
                 BasePrice = product.BasePrice,
-                Status = product.Status
+                Status = product.Status,
+                StockQuantity = product.StockQuantity,   // include in return DTO
+                StoreId = product.StoreId,
+                Images = product.ProductImages.Select(i => i.ImageUrl).ToList()
             };
         }
 
-        public async Task<PagedResult<ProductDto>> GetPagedProductsAsync(int page, int pageSize)
+        public async Task<PagedResult<ProductDto>> GetPagedProductsAsync(
+    int page, int pageSize,
+    Guid? categoryId = null, Guid? subCategoryId = null, Guid? brandId = null,
+    decimal? minPrice = null, decimal? maxPrice = null,
+    string? search = null, string? sortBy = null)
         {
-            var pagedProducts = await _productRepo.GetPagedAsync(page, pageSize);
+            var paged = await _productRepo.GetPagedAsync(page, pageSize,
+                categoryId, subCategoryId, brandId, minPrice, maxPrice, search, sortBy);
+
             return new PagedResult<ProductDto>
             {
-                Items = pagedProducts.Items.Select(p => new ProductDto
+                Items = paged.Items.Select(p => new ProductDto
                 {
                     Id = p.Id,
                     Name = p.Name,
                     Description = p.Description,
                     BasePrice = p.BasePrice,
                     Status = p.Status,
+                    StockQuantity = p.StockQuantity,
+                    StoreId = p.StoreId,
                     Images = p.ProductImages.Select(i => i.ImageUrl).ToList()
                 }),
-                TotalCount = pagedProducts.TotalCount,
-                Page = pagedProducts.Page,
-                PageSize = pagedProducts.PageSize
+                TotalCount = paged.TotalCount,
+                Page = paged.Page,
+                PageSize = paged.PageSize
             };
         }
 
@@ -122,6 +139,8 @@ namespace ECommerce.Application.Services.Catalog
                 Name = product.Name,
                 Description = product.Description,
                 BasePrice = product.BasePrice,
+                StockQuantity = product.StockQuantity,   // ← add this
+                StoreId = product.StoreId,
                 Status = product.Status,
                 Images = product.ProductImages.Select(i => i.ImageUrl).ToList()
             };
@@ -179,6 +198,8 @@ namespace ECommerce.Application.Services.Catalog
                     }).ToList(),
                 BrandId = product.BrandId,
                 BrandName = product.Brand?.Name,
+                StoreLogoUrl = product.Store?.LogoUrl,
+                StoreDescription = product.Store?.Description,
                 SubCategoryId = product.SubCategoryId,
                 SubCategoryName = product.SubCategory?.Name,
                 CategoryId = product.SubCategory?.CategoryId,
@@ -189,6 +210,64 @@ namespace ECommerce.Application.Services.Catalog
                 ReviewCount = reviewCount,
                 CreatedAt = product.CreatedAt
             };
+        }
+        public async Task<ProductImageDto> UploadProductImageAsync(Guid userId, Guid productId, Stream fileStream, string fileName)
+        {
+            var product = await _productRepo.GetByIdAsync(productId)
+                          ?? throw new InvalidOperationException("Product not found.");
+
+            // Ownership check – same as UpdateProductAsync
+            var profile = await _sellerRepo.GetByUserIdAsync(userId)
+                          ?? throw new UnauthorizedAccessException("Not a seller.");
+            var store = await _sellerRepo.GetStoreBySellerIdAsync(profile.Id)
+                        ?? throw new UnauthorizedAccessException("No store.");
+            if (product.StoreId != store.Id)
+                throw new UnauthorizedAccessException("You do not own this product.");
+
+            // Save file using the storage service
+            var imageUrl = await _fileStorageService.SaveFileAsync(fileStream, fileName, "products");
+
+            var productImage = new ProductImage
+            {
+                ProductId = productId,
+                ImageUrl = imageUrl,
+                SortOrder = 0, // could be set to last order, but simple default fine
+                CreatedAt = DateTime.UtcNow
+            };
+            await _productRepo.AddImageAsync(productImage);
+            await _productRepo.SaveChangesAsync();
+
+            return new ProductImageDto
+            {
+                Id = productImage.Id,
+                ImageUrl = productImage.ImageUrl,
+                SortOrder = productImage.SortOrder
+            };
+        }
+
+        public async Task DeleteProductImageAsync(Guid userId, Guid productId, Guid imageId)
+        {
+            var product = await _productRepo.GetByIdAsync(productId)
+                          ?? throw new InvalidOperationException("Product not found.");
+
+            // Ownership check
+            var profile = await _sellerRepo.GetByUserIdAsync(userId)
+                          ?? throw new UnauthorizedAccessException("Not a seller.");
+            var store = await _sellerRepo.GetStoreBySellerIdAsync(profile.Id)
+                        ?? throw new UnauthorizedAccessException("No store.");
+            if (product.StoreId != store.Id)
+                throw new UnauthorizedAccessException("You do not own this product.");
+
+            var image = await _productRepo.GetImageByIdAsync(imageId)
+                        ?? throw new InvalidOperationException("Image not found.");
+            if (image.ProductId != productId)
+                throw new InvalidOperationException("Image does not belong to the specified product.");
+
+            // Delete physical file
+            _fileStorageService.DeleteFile(image.ImageUrl);
+
+            _productRepo.DeleteImage(image);
+            await _productRepo.SaveChangesAsync();
         }
         public async Task<IEnumerable<ProductDto>> GetPublicStoreProductsAsync(Guid storeId)
         {

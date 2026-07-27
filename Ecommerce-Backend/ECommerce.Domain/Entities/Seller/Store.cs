@@ -13,6 +13,7 @@ namespace ECommerce.Domain.Entities
         public bool IsDeleted { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+        public string? LogoUrl { get; set; }
 
         public ICollection<Product> Products { get; set; } = new List<Product>();
         public ICollection<SellerOrder> SellerOrders { get; set; } = new List<SellerOrder>();

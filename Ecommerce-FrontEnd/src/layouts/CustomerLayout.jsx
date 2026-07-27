@@ -1,6 +1,7 @@
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
+import { loadCart } from "../store/cartSlice";
 import axiosInstance from "../services/axiosInstance";
 
 const CustomerLayout = () => {
@@ -10,6 +11,12 @@ const CustomerLayout = () => {
   const cartItemCount = useSelector((state) => state.cart?.totalCount || 0);
   const [sellerStatus, setSellerStatus] = useState(null);
 
+   useEffect(() => {
+  if (user) {
+    dispatch(loadCart());
+  }
+}, [user, dispatch]);
+
   useEffect(() => {
     if (user) {
       axiosInstance.get("/seller/status")
@@ -17,6 +24,7 @@ const CustomerLayout = () => {
         .catch(() => setSellerStatus(null));
     }
   }, [user]);
+ 
 
   const getDashboardLink = () => {
     if (!user) return null;
@@ -60,14 +68,17 @@ const CustomerLayout = () => {
           </div>
 
           {user ? (
-            <div className="navbar-links">
-              <Link to="/profile">Profile</Link>
-            </div>
-          ) : (
-            <div className="navbar-links">
-              <Link to="/login">Sign In</Link>
-            </div>
-          )}
+  <div className="navbar-links">
+    <Link to="/orders">Orders</Link>
+    <Link to="/profile">Profile</Link>
+    <Link to="/reviews/my">Reviews</Link>
+  </div>
+) : (
+  <div className="navbar-links">
+    <Link to="/login">Sign In</Link>
+  </div>
+)}
+          
         </div>
       </header>
 

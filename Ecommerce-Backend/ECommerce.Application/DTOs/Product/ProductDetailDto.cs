@@ -16,6 +16,8 @@
         public Guid? CategoryId { get; set; }
         public string? CategoryName { get; set; }
         public Guid StoreId { get; set; }
+        public string? StoreLogoUrl { get; set; }
+        public string? StoreDescription { get; set; }
         public string StoreName { get; set; } = string.Empty;
         public double? AverageRating { get; set; }
         public int ReviewCount { get; set; }

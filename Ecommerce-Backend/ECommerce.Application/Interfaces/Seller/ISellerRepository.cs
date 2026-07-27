@@ -14,6 +14,7 @@ namespace ECommerce.Application.Interfaces
         Task<SellerProfile?> GetByIdAsync(Guid id);
         Task<int> GetSellerCountAsync();
         Task<int> GetPendingSellerCountAsync();
+        Task<Store?> GetStoreByIdAsync(Guid storeId);
         Task SaveChangesAsync();
     }
 }

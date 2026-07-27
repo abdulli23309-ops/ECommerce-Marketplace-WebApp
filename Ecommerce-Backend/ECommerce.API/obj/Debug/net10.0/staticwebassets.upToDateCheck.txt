@@ -1,0 +1,5 @@
+wwwroot\uploads\products\33b036b3-c177-4f27-be09-5f7046cc91a6.png
+wwwroot\uploads\products\eb49312d-37eb-4112-9389-d5a64806b013.png
+wwwroot\uploads\products\ef084779-2728-4a01-8535-288f48e0cc3b.png
+wwwroot\uploads\stores\logos\244e86ba-3d0d-484e-8b72-29325fe05cb9.png
+wwwroot\uploads\stores\logos\6e2bcd9b-c775-4a90-901c-f77a9ecbd118.png

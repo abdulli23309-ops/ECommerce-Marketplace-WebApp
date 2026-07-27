@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { getImageUrl } from "../../utils/imageHelper";
 import { fetchSellerProducts, deleteProduct } from "../../services/sellerProductService";
 
 const SellerProductsPage = () => {
@@ -24,7 +25,7 @@ const SellerProductsPage = () => {
   const handleDelete = async (productId) => {
     if (!window.confirm("Delete this product?")) return;
     try {
-      await deleteProduct(productId); // might not be implemented yet
+      await deleteProduct(productId);
       loadProducts();
     } catch (err) {
       console.error("Failed to delete", err);
@@ -61,7 +62,11 @@ const SellerProductsPage = () => {
               <tr key={product.id}>
                 <td>
                   {product.images && product.images.length > 0 ? (
-                    <img src={product.images[0]} alt={product.name} style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "0.25rem" }} />
+                    <img
+                      src={getImageUrl(product.images[0])}
+                      alt={product.name}
+                      style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "0.25rem" }}
+                    />
                   ) : (
                     <div style={{ width: "50px", height: "50px", background: "#f3f4f6", borderRadius: "0.25rem" }} />
                   )}

@@ -15,6 +15,7 @@ namespace ECommerce.Application.Services.Admin
         private readonly IReturnRepository _returnRepo;
         private readonly IUserRepository _userRepo;
         private readonly IPaymentRepository _paymentRepo;
+        
 
         public AdminService(
             ISellerRepository sellerRepo,
@@ -63,25 +64,9 @@ namespace ECommerce.Application.Services.Admin
             });
         }
 
-        public async Task ApproveSellerAsync(Guid sellerId)
-        {
-            var seller = await _sellerRepo.GetByIdAsync(sellerId)
-                         ?? throw new InvalidOperationException("Seller not found.");
-            seller.Status = "Approved";
-            seller.UpdatedAt = DateTime.UtcNow;
-            _sellerRepo.UpdateProfile(seller);
-            await _sellerRepo.SaveChangesAsync();
-        }
+       
 
-        public async Task RejectSellerAsync(Guid sellerId)
-        {
-            var seller = await _sellerRepo.GetByIdAsync(sellerId)
-                         ?? throw new InvalidOperationException("Seller not found.");
-            seller.Status = "Rejected";
-            seller.UpdatedAt = DateTime.UtcNow;
-            _sellerRepo.UpdateProfile(seller);
-            await _sellerRepo.SaveChangesAsync();
-        }
+       
 
         public async Task<IEnumerable<ProductAdminDto>> GetProductsAsync()
         {
@@ -169,6 +154,27 @@ namespace ECommerce.Application.Services.Admin
             request.UpdatedAt = DateTime.UtcNow;
             _returnRepo.Update(request);
             await _returnRepo.SaveChangesAsync();
+        }
+        public async Task RejectSellerAsync(Guid sellerId, string? reason)
+        {
+            var seller = await _sellerRepo.GetByIdAsync(sellerId)
+                         ?? throw new InvalidOperationException("Seller not found.");
+            seller.Status = "Rejected";
+            seller.RejectionReason = reason;
+            seller.UpdatedAt = DateTime.UtcNow;
+            _sellerRepo.UpdateProfile(seller);
+            await _sellerRepo.SaveChangesAsync();
+        }
+        public async Task ApproveSellerAsync(Guid sellerId)
+        {
+            var seller = await _sellerRepo.GetByIdAsync(sellerId)
+                         ?? throw new InvalidOperationException("Seller not found.");
+            seller.Status = "Approved";
+            seller.RejectionReason = null;
+            seller.UpdatedAt = DateTime.UtcNow;
+            _sellerRepo.UpdateProfile(seller);
+            await _userRepo.AddUserRoleAsync(seller.UserId, "Seller");
+            await _sellerRepo.SaveChangesAsync();
         }
 
         public async Task RejectReturnAsync(Guid returnId)

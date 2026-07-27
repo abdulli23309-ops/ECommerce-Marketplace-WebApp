@@ -12,6 +12,7 @@ namespace ECommerce.Domain.Entities
         public string Status { get; set; } = "Pending"; 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+        public string? RejectionReason { get; set; }
         public ICollection<Store> Stores { get; set; } = new List<Store>();
     }
 }
