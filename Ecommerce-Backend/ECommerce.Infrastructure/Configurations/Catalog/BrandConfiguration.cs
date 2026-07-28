@@ -11,7 +11,7 @@ namespace ECommerce.Infrastructure.Data.Configurations.Catalog
             builder.ToTable("Brands");
             builder.HasKey(b => b.Id);
             builder.Property(b => b.Name).IsRequired().HasMaxLength(200);
-            builder.HasIndex(b => b.Name).IsUnique();
+            builder.HasIndex(b => b.Name).IsUnique().HasFilter("[IsDeleted] = 0");
             builder.Property(b => b.IsDeleted).IsRequired().HasDefaultValue(false);
             builder.Property(b => b.CreatedAt).IsRequired().HasDefaultValueSql("SYSUTCDATETIME()");
             builder.HasQueryFilter(b => !b.IsDeleted);

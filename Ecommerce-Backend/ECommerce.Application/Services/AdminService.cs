@@ -1,5 +1,8 @@
 ﻿using ECommerce.Application.DTOs.Admin;
+using ECommerce.Application.DTOs.Payment;
+using ECommerce.Application.Helpers;
 using ECommerce.Application.Interfaces;
+using ECommerce.Application.Interfaces.Admin;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +18,8 @@ namespace ECommerce.Application.Services.Admin
         private readonly IReturnRepository _returnRepo;
         private readonly IUserRepository _userRepo;
         private readonly IPaymentRepository _paymentRepo;
-        
+        private readonly IRoleRepository _roleRepo;
+
 
         public AdminService(
             ISellerRepository sellerRepo,
@@ -24,7 +28,8 @@ namespace ECommerce.Application.Services.Admin
             IShipmentRepository shipmentRepo,
             IReturnRepository returnRepo,
             IUserRepository userRepo,
-    IPaymentRepository paymentRepo)
+            IRoleRepository roleRepo,
+            IPaymentRepository paymentRepo)
         {
             _sellerRepo = sellerRepo;
             _productRepo = productRepo;
@@ -32,6 +37,7 @@ namespace ECommerce.Application.Services.Admin
             _shipmentRepo = shipmentRepo;
             _returnRepo = returnRepo;
             _userRepo = userRepo;
+            _roleRepo = roleRepo;
             _paymentRepo = paymentRepo;
         }
 
@@ -82,6 +88,46 @@ namespace ECommerce.Application.Services.Admin
                 StockQuantity = p.StockQuantity,
                 IsDeleted = p.IsDeleted
             });
+        }
+        public async Task<PagedResult<ShipmentAdminDto>> GetShipmentsPagedAsync(int page, int pageSize, string? search = null, string? status = null)
+        {
+            var paged = await _shipmentRepo.GetPagedAsync(page, pageSize, search, status);
+            return new PagedResult<ShipmentAdminDto>
+            {
+                Items = paged.Items.Select(s => new ShipmentAdminDto
+                {
+                    Id = s.Id,
+                    SellerOrderId = s.SellerOrderId,
+                    TrackingNumber = s.TrackingNumber,
+                    Carrier = s.Carrier,
+                    Status = s.Status,
+                    CreatedAt = s.CreatedAt
+                }),
+                TotalCount = paged.TotalCount,
+                Page = paged.Page,
+                PageSize = paged.PageSize
+            };
+        }
+
+        public async Task<PagedResult<PaymentAdminDto>> GetPaymentsPagedAsync(int page, int pageSize, string? search = null, string? status = null, string? method = null)
+        {
+            var paged = await _paymentRepo.GetPagedAsync(page, pageSize, search, status, method);
+            return new PagedResult<PaymentAdminDto>
+            {
+                Items = paged.Items.Select(p => new PaymentAdminDto
+                {
+                    PaymentId = p.Id,
+                    OrderId = p.ParentOrderId,
+                    CustomerEmail = p.ParentOrder?.Customer?.Email ?? "",
+                    Amount = p.Amount,
+                    Status = p.Status,
+                    Method = p.Method,
+                    CreatedAt = p.CreatedAt
+                }),
+                TotalCount = paged.TotalCount,
+                Page = paged.Page,
+                PageSize = paged.PageSize
+            };
         }
 
         public async Task UpdateProductStatusAsync(Guid productId, string status)
@@ -165,16 +211,58 @@ namespace ECommerce.Application.Services.Admin
             _sellerRepo.UpdateProfile(seller);
             await _sellerRepo.SaveChangesAsync();
         }
-        public async Task ApproveSellerAsync(Guid sellerId)
+        public async Task ApproveSellerAsync(Guid sellerId, string? roleId = null)
         {
             var seller = await _sellerRepo.GetByIdAsync(sellerId)
                          ?? throw new InvalidOperationException("Seller not found.");
+
             seller.Status = "Approved";
             seller.RejectionReason = null;
             seller.UpdatedAt = DateTime.UtcNow;
             _sellerRepo.UpdateProfile(seller);
+
+            // Always assign the base 'Seller' role
             await _userRepo.AddUserRoleAsync(seller.UserId, "Seller");
+
+            // If an additional role (with permissions) was selected, assign it
+            if (!string.IsNullOrEmpty(roleId) && Guid.TryParse(roleId, out var parsedRoleId))
+            {
+                // Check if the role exists and has permission groups attached (optional validation)
+                var role = await _roleRepo.GetByIdAsync(parsedRoleId);
+                if (role != null && role.Name != "Seller")   // don't duplicate base seller
+                {
+                    await _userRepo.AddUserRoleAsync(seller.UserId, role.Name);
+                }
+            }
+
             await _sellerRepo.SaveChangesAsync();
+        }
+        public async Task<PagedResult<ParentOrderAdminDto>> GetOrdersPagedAsync(int page, int pageSize, string? search = null, string? status = null, string? sortBy = null)
+        {
+            var paged = await _orderRepo.GetPagedAsync(page, pageSize, search, status, sortBy);
+            return new PagedResult<ParentOrderAdminDto>
+            {
+                Items = paged.Items.Select(po => new ParentOrderAdminDto
+                {
+                    Id = po.Id,
+                    CustomerId = po.CustomerId,
+                    CustomerEmail = po.Customer?.Email ?? "",
+                    OrderDate = po.OrderDate,
+                    OrderStatus = po.OrderStatus,
+                    TotalAmount = po.TotalAmount,
+                    SellerOrders = po.SellerOrders.Select(so => new SellerOrderAdminDto
+                    {
+                        Id = so.Id,
+                        StoreId = so.StoreId,
+                        StoreName = so.Store?.Name ?? "",
+                        SubTotal = so.SubTotal,
+                        Status = so.Status
+                    }).ToList()
+                }),
+                TotalCount = paged.TotalCount,
+                Page = paged.Page,
+                PageSize = paged.PageSize
+            };
         }
 
         public async Task RejectReturnAsync(Guid returnId)

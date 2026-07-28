@@ -1,4 +1,5 @@
 ﻿using ECommerce.Application.Interfaces;
+using ECommerce.Application.Interfaces.Admin;
 using ECommerce.Infrastructure.Data;
 using ECommerce.Infrastructure.Repositories;
 using ECommerce.Infrastructure.Repositories.Catalog;
@@ -37,7 +38,11 @@ namespace ECommerce.Infrastructure
             services.AddScoped<IReviewRepository, ReviewRepository>();
             services.AddScoped<IReturnRepository, ReturnRepository>();
             services.AddScoped<IRefundRepository, RefundRepository>();
+            services.AddScoped<IPermissionRepository, PermissionRepository>();
+            services.AddScoped<IRolePermissionGroupRepository, RolePermissionGroupRepository>();
             services.AddScoped<IFileStorageService, LocalFileStorageService>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IPermissionGroupRepository, PermissionGroupRepository>();
 
             // Infrastructure-only services
             services.AddScoped<IPasswordHasherService, BCryptPasswordHasherService>();

@@ -11,10 +11,12 @@ namespace ECommerce.API.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly IUserRepository _userRepository;
 
-        public AccountController(IAuthService authService)
+        public AccountController(IAuthService authService, IUserRepository userRepository)
         {
             _authService = authService;
+            _userRepository = userRepository;
         }
 
         [HttpPost("register")]
@@ -40,6 +42,14 @@ namespace ECommerce.API.Controllers
             var result = await _authService.RefreshTokenAsync(refreshToken);
             if (!result.Succeeded) return Unauthorized(result);
             return Ok(result);
+        }
+        [HttpGet("permissions")]
+        [Authorize]
+        public async Task<IActionResult> GetMyPermissions()
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var permissions = await _userRepository.GetPermissionCodesAsync(userId);
+            return Ok(permissions);
         }
 
         [HttpPost("logout")]

@@ -37,7 +37,6 @@ const ReviewDetailPage = () => {
       <h2 className="section-title" style={{ marginBottom: "1.5rem" }}>Review Details</h2>
 
       <div className="review-card" style={{ border: "1px solid #eaeaea", borderRadius: "0.5rem", padding: "1.5rem", background: "#fff" }}>
-        {/* Product & Rating */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
           <div>
             <p style={{ fontWeight: 600, color: "#000", margin: 0 }}>{review.productName}</p>
@@ -55,15 +54,12 @@ const ReviewDetailPage = () => {
           </span>
         </div>
 
-        {/* Comment */}
-        {review.comment && (
+        {review.comment ? (
           <p style={{ margin: "0 0 1rem 0", color: "#333", lineHeight: 1.6 }}>{review.comment}</p>
-        )}
-        {!review.comment && (
+        ) : (
           <p style={{ margin: "0 0 1rem 0", color: "#999", fontStyle: "italic" }}>No comment provided.</p>
         )}
 
-        {/* Images */}
         {review.images?.length > 0 && (
           <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginBottom: "1rem" }}>
             {review.images.map((img, idx) => (
@@ -77,7 +73,6 @@ const ReviewDetailPage = () => {
           </div>
         )}
 
-        {/* Date */}
         <p style={{ fontSize: "0.85rem", color: "#888", margin: 0 }}>
           Reviewed on {new Date(review.createdAt).toLocaleDateString()} at {new Date(review.createdAt).toLocaleTimeString()}
         </p>

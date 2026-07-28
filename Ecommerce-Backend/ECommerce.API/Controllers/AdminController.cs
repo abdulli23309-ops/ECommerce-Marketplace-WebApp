@@ -27,15 +27,14 @@ namespace ECommerce.API.Controllers
         [HttpGet("sellers")]
         public async Task<IActionResult> GetSellers() => Ok(await _adminService.GetSellersAsync());
 
+        
         [HttpPut("sellers/{id}/approve")]
-        public async Task<IActionResult> ApproveSeller(Guid id)
+        public async Task<IActionResult> ApproveSeller(Guid id, [FromBody] string? roleId = null)
         {
-            await _adminService.ApproveSellerAsync(id);
+            await _adminService.ApproveSellerAsync(id, roleId);
             return NoContent();
         }
-
         
-
         // --- Products ---
         [HttpGet("products")]
         public async Task<IActionResult> GetProducts() => Ok(await _adminService.GetProductsAsync());
@@ -47,13 +46,16 @@ namespace ECommerce.API.Controllers
             return NoContent();
         }
 
-        // --- Orders ---
         [HttpGet("orders")]
-        public async Task<IActionResult> GetOrders() => Ok(await _adminService.GetOrdersAsync());
+        public async Task<IActionResult> GetOrders([FromQuery] int page = 1, [FromQuery] int pageSize = 10,
+    [FromQuery] string? search = null, [FromQuery] string? status = null, [FromQuery] string? sortBy = null)
+    => Ok(await _adminService.GetOrdersPagedAsync(page, pageSize, search, status, sortBy));
 
-        // --- Shipments ---
+
         [HttpGet("shipments")]
-        public async Task<IActionResult> GetShipments() => Ok(await _adminService.GetShipmentsAsync());
+        public async Task<IActionResult> GetShipments([FromQuery] int page = 1, [FromQuery] int pageSize = 10,
+    [FromQuery] string? search = null, [FromQuery] string? status = null)
+    => Ok(await _adminService.GetShipmentsPagedAsync(page, pageSize, search, status));
 
         // --- Returns ---
         [HttpGet("returns")]
@@ -81,11 +83,9 @@ namespace ECommerce.API.Controllers
             return Ok(result);
         }
         [HttpGet("payments")]
-        public async Task<IActionResult> GetPayments()
-        {
-            var payments = await _paymentService.GetAllPaymentsAsync();
-            return Ok(payments);
-        }
+        public async Task<IActionResult> GetPayments([FromQuery] int page = 1, [FromQuery] int pageSize = 10,
+    [FromQuery] string? search = null, [FromQuery] string? status = null, [FromQuery] string? method = null)
+    => Ok(await _adminService.GetPaymentsPagedAsync(page, pageSize, search, status, method));
         [HttpGet("stats")]
         public async Task<IActionResult> GetStats()
         {

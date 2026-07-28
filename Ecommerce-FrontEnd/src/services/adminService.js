@@ -5,8 +5,10 @@ export const getSellers = async () => {
   return response.data;
 };
 
-export const approveSeller = async (sellerId) => {
-  await axiosInstance.put(`/admin/sellers/${sellerId}/approve`);
+export const approveSeller = async (sellerId, roleId) => {
+  await axiosInstance.put(`/admin/sellers/${sellerId}/approve`, roleId, {
+    headers: { "Content-Type": "application/json" },
+  });
 };
 
 export const rejectSeller = async (sellerId, reason) => {

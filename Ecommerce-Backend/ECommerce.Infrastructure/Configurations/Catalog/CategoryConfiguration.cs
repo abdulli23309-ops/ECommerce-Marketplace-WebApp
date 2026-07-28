@@ -12,7 +12,7 @@ namespace ECommerce.Infrastructure.Data.Configurations.Catalog
             builder.HasKey(c => c.Id);
 
             builder.Property(c => c.Name).IsRequired().HasMaxLength(200);
-            builder.HasIndex(c => c.Name).IsUnique();
+            builder.HasIndex(c => c.Name).IsUnique().HasFilter("[IsDeleted] = 0");
 
             builder.Property(c => c.IsDeleted).IsRequired().HasDefaultValue(false);
             builder.Property(c => c.CreatedAt).IsRequired().HasDefaultValueSql("SYSUTCDATETIME()");

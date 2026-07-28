@@ -13,6 +13,8 @@ namespace ECommerce.Infrastructure.Data.Configurations.Permissions
 
             builder.Property(p => p.Name).IsRequired().HasMaxLength(200);
             builder.HasIndex(p => p.Name).IsUnique();
+            builder.Property(p => p.Code).IsRequired().HasMaxLength(100);   
+            builder.HasIndex(p => p.Code).IsUnique();
 
             builder.Property(p => p.Description).HasMaxLength(500);
         }

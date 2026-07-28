@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { loginUser } from "../../services/authService";
+import { fetchPermissions } from "../../store/permissionsSlice";
 import { setCredentials } from "../../store/authSlice";
 
 const LoginPage = () => {
@@ -31,7 +32,7 @@ const LoginPage = () => {
     };
 
     dispatch(setCredentials({ user, accessToken: result.accessToken, refreshToken: result.refreshToken }));
-
+    dispatch(fetchPermissions());
     // 🔁 Role‑based redirect – priority order: Admin > Seller > Customer
     if (roles.includes("SuperAdmin")) {
       navigate("/admin/dashboard");

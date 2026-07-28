@@ -110,7 +110,8 @@ namespace ECommerce.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("Brands", (string)null);
                 });
@@ -198,7 +199,8 @@ namespace ECommerce.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("Categories", (string)null);
                 });
@@ -357,6 +359,11 @@ namespace ECommerce.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -367,6 +374,9 @@ namespace ECommerce.Infrastructure.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -732,6 +742,29 @@ namespace ECommerce.Infrastructure.Migrations
                     b.HasIndex("PermissionId");
 
                     b.ToTable("RolePermissions", (string)null);
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.RolePermissionGroup", b =>
+                {
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PermissionGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("RolePermissionGroupPermissionGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("RolePermissionGroupRoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("RoleId", "PermissionGroupId");
+
+                    b.HasIndex("PermissionGroupId");
+
+                    b.HasIndex("RolePermissionGroupRoleId", "RolePermissionGroupPermissionGroupId");
+
+                    b.ToTable("RolePermissionGroups", (string)null);
                 });
 
             modelBuilder.Entity("ECommerce.Domain.Entities.SellerOrder", b =>
@@ -1274,6 +1307,29 @@ namespace ECommerce.Infrastructure.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("ECommerce.Domain.Entities.RolePermissionGroup", b =>
+                {
+                    b.HasOne("ECommerce.Domain.Entities.PermissionGroup", "PermissionGroup")
+                        .WithMany("RolePermissionGroups")
+                        .HasForeignKey("PermissionGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Domain.Entities.Role", "Role")
+                        .WithMany("RolePermissionGroups")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Domain.Entities.RolePermissionGroup", null)
+                        .WithMany("RolePermissionGroups")
+                        .HasForeignKey("RolePermissionGroupRoleId", "RolePermissionGroupPermissionGroupId");
+
+                    b.Navigation("PermissionGroup");
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("ECommerce.Domain.Entities.SellerOrder", b =>
                 {
                     b.HasOne("ECommerce.Domain.Entities.ParentOrder", "ParentOrder")
@@ -1398,6 +1454,8 @@ namespace ECommerce.Infrastructure.Migrations
             modelBuilder.Entity("ECommerce.Domain.Entities.PermissionGroup", b =>
                 {
                     b.Navigation("PermissionGroupPermissions");
+
+                    b.Navigation("RolePermissionGroups");
                 });
 
             modelBuilder.Entity("ECommerce.Domain.Entities.Product", b =>
@@ -1421,9 +1479,16 @@ namespace ECommerce.Infrastructure.Migrations
 
             modelBuilder.Entity("ECommerce.Domain.Entities.Role", b =>
                 {
+                    b.Navigation("RolePermissionGroups");
+
                     b.Navigation("RolePermissions");
 
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.RolePermissionGroup", b =>
+                {
+                    b.Navigation("RolePermissionGroups");
                 });
 
             modelBuilder.Entity("ECommerce.Domain.Entities.SellerOrder", b =>

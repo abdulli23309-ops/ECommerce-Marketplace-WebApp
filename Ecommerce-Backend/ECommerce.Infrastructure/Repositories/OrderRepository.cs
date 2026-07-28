@@ -1,4 +1,5 @@
-﻿using ECommerce.Application.Interfaces;
+﻿using ECommerce.Application.Helpers;
+using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,30 @@ namespace ECommerce.Infrastructure.Repositories
 
         public async Task AddSellerOrderAsync(SellerOrder order)
             => await _context.SellerOrders.AddAsync(order);
+        public async Task<PagedResult<ParentOrder>> GetPagedAsync(int page, int pageSize, string? search = null, string? status = null, string? sortBy = null)
+        {
+            var query = _context.ParentOrders
+                .Include(po => po.Customer)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var term = search.Trim().ToLower();
+                query = query.Where(po => po.Id.ToString().ToLower().Contains(term)
+                                          || (po.Customer != null && po.Customer.Email.ToLower().Contains(term)));
+            }
+            if (!string.IsNullOrWhiteSpace(status))
+                query = query.Where(po => po.OrderStatus == status);
+
+            query = sortBy switch
+            {
+                "newest" => query.OrderByDescending(po => po.CreatedAt),
+                "oldest" => query.OrderBy(po => po.CreatedAt),
+                _ => query.OrderByDescending(po => po.CreatedAt)
+            };
+
+            return await query.ToPagedResultAsync(page, pageSize);
+        }
 
         public async Task AddOrderItemAsync(OrderItem item)
             => await _context.OrderItems.AddAsync(item);

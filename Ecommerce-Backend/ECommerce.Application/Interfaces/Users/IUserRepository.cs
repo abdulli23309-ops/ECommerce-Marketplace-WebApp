@@ -1,4 +1,5 @@
-﻿using ECommerce.Domain.Entities;
+﻿using ECommerce.Application.Helpers;
+using ECommerce.Domain.Entities;
 
 namespace ECommerce.Application.Interfaces
 {
@@ -11,6 +12,11 @@ namespace ECommerce.Application.Interfaces
         Task SaveChangesAsync();
         Task AddUserRoleAsync(Guid userId, string roleName);
         Task<User?> GetByRefreshTokenAsync(string refreshToken);
+        Task<List<string>> GetPermissionCodesAsync(Guid userId);
+        Task<PagedResult<User>> GetPagedAsync(int page, int pageSize, string? search = null, string? role = null, bool? isActive = null);
+        Task<User?> GetByIdWithRolesAsync(Guid userId);
+        Task ActivateAsync(Guid userId);
+        Task DeactivateAsync(Guid userId);
         Task<int> GetUserCountAsync();
         Task<IList<string>> GetUserRolesAsync(Guid userId);
     }

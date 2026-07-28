@@ -149,11 +149,15 @@ const OrderDetailPage = () => {
                 Cancel Order
               </button>
             )}
-            {order.orderStatus === "Delivered" && (
-              <button className="btn-remove" style={{ fontWeight: 600, border: "1px solid #eaeaea", background: "#fff", padding: "0.5rem 1rem", cursor: "pointer" }}>
-                Request Return
-              </button>
-            )}
+            {so.shipment?.status === "Delivered" && (
+  <Link
+    to={`/returns/new/${item.orderItemId}`}
+    className="btn-edit"
+    style={{ fontSize: "0.8rem", textDecoration: "underline", marginLeft: "1rem" }}
+  >
+    Request Return
+  </Link>
+)}
           </div>
         </div>
       ))}

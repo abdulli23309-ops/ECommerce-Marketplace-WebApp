@@ -1,4 +1,5 @@
-﻿using ECommerce.Application.Interfaces;
+﻿using ECommerce.Application.Helpers;
+using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,22 @@ namespace ECommerce.Infrastructure.Repositories.Orders
         .FirstOrDefaultAsync(s => s.Id == shipmentId);
         public async Task<IEnumerable<Shipment>> GetAllAsync()
     => await _context.Shipments.ToListAsync();
+        public async Task<PagedResult<Shipment>> GetPagedAsync(int page, int pageSize, string? search = null, string? status = null)
+        {
+            var query = _context.Shipments.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var term = search.Trim().ToLower();
+                query = query.Where(s => s.TrackingNumber != null && s.TrackingNumber.ToLower().Contains(term)
+                                          || s.Carrier != null && s.Carrier.ToLower().Contains(term));
+            }
+            if (!string.IsNullOrWhiteSpace(status))
+                query = query.Where(s => s.Status == status);
+
+            query = query.OrderByDescending(s => s.CreatedAt);
+            return await query.ToPagedResultAsync(page, pageSize);
+        }
         public async Task<int> GetPendingShipmentsCountByStoreIdAsync(Guid storeId)
     => await _context.Shipments
         .Where(s => s.SellerOrder.StoreId == storeId && s.Status != "Delivered")

@@ -24,9 +24,13 @@ namespace ECommerce.Application
             services.AddScoped<IAddressService, AddressService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IPermissionGroupService, PermissionGroupService>();
+            services.AddScoped<IRolePermissionGroupService, RolePermissionGroupService>();
+            services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IBrandService, BrandService>();
             services.AddScoped<IShipmentService, ShipmentService>();
             services.AddScoped<IReviewService, ReviewService>();
+            services.AddScoped<IAdminUserService, AdminUserService>();
             services.AddScoped<IReturnService, ReturnService>();
             services.AddScoped<IRefundService, RefundService>();
             services.AddScoped<IAdminService, AdminService>();

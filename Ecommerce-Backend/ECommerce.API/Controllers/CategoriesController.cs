@@ -46,5 +46,24 @@ namespace ECommerce.API.Controllers
             if (result == null) return NotFound();
             return Ok(result);
         }
+        [HttpDelete("{categoryId}/subcategories/{subCategoryId}")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<IActionResult> DeleteSubCategory(Guid categoryId, Guid subCategoryId)
+        {
+            var result = await _service.DeleteSubCategoryAsync(categoryId, subCategoryId);
+            if (!result) return NotFound();
+            return NoContent();
+        }
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<IActionResult> DeleteCategory(Guid id)
+        {
+            var category = await _service.GetByIdAsync(id);
+            if (category == null) return NotFound();
+
+            // Soft-delete the category (set IsDeleted = true)
+            await _service.DeleteCategoryAsync(id);
+            return NoContent();
+        }
     }
 }

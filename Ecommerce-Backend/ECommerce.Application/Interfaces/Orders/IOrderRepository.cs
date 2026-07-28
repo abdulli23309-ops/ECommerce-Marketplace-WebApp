@@ -1,4 +1,5 @@
-﻿using ECommerce.Domain.Entities;
+﻿using ECommerce.Application.Helpers;
+using ECommerce.Domain.Entities;
 
 namespace ECommerce.Application.Interfaces
 {
@@ -14,6 +15,7 @@ namespace ECommerce.Application.Interfaces
         Task<int> GetOrderCountAsync();
         Task<ParentOrder?> GetOrderByIdForUserAsync(Guid parentOrderId, Guid userId);
         Task<SellerOrder?> GetSellerOrderByIdAsync(Guid sellerOrderId);
+        Task<PagedResult<ParentOrder>> GetPagedAsync(int page, int pageSize, string? search = null, string? status = null, string? sortBy = null);
         void UpdateSellerOrder(SellerOrder order);
         Task<ParentOrder?> GetParentOrderByIdAsync(Guid parentOrderId);
         void UpdateParentOrder(ParentOrder order);

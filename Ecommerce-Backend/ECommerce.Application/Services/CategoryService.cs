@@ -57,5 +57,32 @@ namespace ECommerce.Application.Services
             await _repo.SaveChangesAsync();
             return new SubCategoryDto { Id = target.Id, Name = target.Name, CategoryId = target.CategoryId };
         }
+        public async Task<CategoryDto?> GetByIdAsync(Guid id)
+        {
+            var category = await _repo.GetByIdAsync(id);
+            if (category == null) return null;
+            return new CategoryDto { Id = category.Id, Name = category.Name };
+        }
+
+        public async Task DeleteCategoryAsync(Guid id)
+        {
+            var category = await _repo.GetByIdAsync(id)
+                        ?? throw new InvalidOperationException("Category not found.");
+            category.IsDeleted = true;
+            category.UpdatedAt = DateTime.UtcNow;
+            _repo.Update(category);
+            await _repo.SaveChangesAsync();
+        }
+        public async Task<bool> DeleteSubCategoryAsync(Guid categoryId, Guid subCategoryId)
+        {
+            var subs = await _repo.GetSubCategoriesAsync(categoryId);
+            var sub = subs.FirstOrDefault(s => s.Id == subCategoryId);
+            if (sub == null) return false;
+            sub.IsDeleted = true;
+            sub.UpdatedAt = DateTime.UtcNow;
+            _repo.UpdateSubCategory(sub);
+            await _repo.SaveChangesAsync();
+            return true;
+        }
     }
 }

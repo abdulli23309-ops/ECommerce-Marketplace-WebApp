@@ -14,8 +14,6 @@ namespace ECommerce.Infrastructure.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
-        public DbSet<Permission> Permissions { get; set; }
-        public DbSet<PermissionGroup> PermissionGroups { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
         public DbSet<PermissionGroupPermission> PermissionGroupPermissions { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
@@ -43,10 +41,13 @@ namespace ECommerce.Infrastructure.Data
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Shipment> Shipments { get; set; }
+        public DbSet<PermissionGroup> PermissionGroups { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
         public DbSet<ShipmentTrackingHistory> ShipmentTrackingHistories { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<ReviewImage> ReviewImages { get; set; }
         public DbSet<ReturnRequest> ReturnRequests { get; set; }
+        public DbSet<RolePermissionGroup> RolePermissionGroups { get; set; }
         public DbSet<ReturnImage> ReturnImages { get; set; }
         public DbSet<Refund> Refunds { get; set; }
         // Payment

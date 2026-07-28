@@ -1,4 +1,7 @@
 import { Routes, Route } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchPermissions } from "./store/permissionsSlice";
 import AuthLayout from "./layouts/AuthLayout";
 import CustomerLayout from "./layouts/CustomerLayout";
 import SellerLayout from "./layouts/SellerLayout";
@@ -15,13 +18,17 @@ import CheckoutPage from "./pages/customer/CheckoutPage";
 import SellerProductsPage from "./pages/seller/SellerProductsPage";
 import ProductForm from "./pages/seller/ProductForm";
 import SellerOrdersPage from "./pages/seller/SellerOrdersPage";
+import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import SellerApprovalPage from "./pages/admin/SellerApprovalPage";
+import AdminCategoriesPage from "./pages/admin/AdminCategoriesPage";
+import AdminBrandsPage from "./pages/admin/AdminBrandsPage";
 import ProductModerationPage from "./pages/admin/ProductModerationPage";
 import ReturnsManagementPage from "./pages/admin/ReturnsManagementPage";
 import RefundManagementPage from "./pages/admin/RefundManagementPage";
 import ProductDetailPage from "./pages/customer/ProductDetailPage";
 import SellerPendingPage from "./pages/seller/SellerPendingPage";
 import SellerRegisterPage from "./pages/seller/SellerRegisterPage";
+import RolePermissionGroupsPage from "./pages/admin/RolePermissionGroupsPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AddressBookPage from "./pages/customer/AddressBookPage";
 import ProductListingPage from "./pages/customer/ProductListingPage";
@@ -34,10 +41,24 @@ import ShipmentManagementPage from "./pages/seller/ShipmentManagementPage";
 import ReviewPage from "./pages/customer/ReviewPage";
 import MyReviewsPage from "./pages/customer/MyReviewsPage";
 import ReviewDetailPage from "./pages/customer/ReviewDetailPage";
+import PermissionGroupsPage from "./pages/admin/PermissionGroupsPage";
+import AdminOrdersPage from "./pages/admin/AdminOrdersPage";
+import AdminShipmentsPage from "./pages/admin/AdminShipmentsPage";
+import AdminPaymentsPage from "./pages/admin/AdminPaymentsPage";
 
 
 const App = () => {
+  const dispatch = useDispatch();
+const { accessToken } = useSelector(state => state.auth);
+const { codes } = useSelector(state => state.permissions);
+
+useEffect(() => {
+  if (accessToken && codes.length === 0) {
+    dispatch(fetchPermissions());
+  }
+}, [accessToken, codes, dispatch]);
   return (
+    
     <Routes>
       {/* Public auth pages – NOT protected */}
       <Route element={<AuthLayout />}>
@@ -114,6 +135,14 @@ const App = () => {
           <Route path="/admin/returns" element={<ReturnsManagementPage />} />
           <Route path="/admin/refunds" element={<RefundManagementPage />} />
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+          <Route path="/admin/permission-groups" element={<PermissionGroupsPage />} />
+          <Route path="/admin/role-permission-groups" element={<RolePermissionGroupsPage />} />
+          <Route path="/admin/users" element={<AdminUsersPage />} />
+          <Route path="/admin/categories" element={<AdminCategoriesPage />} />
+          <Route path="/admin/orders" element={<AdminOrdersPage />} />
+<Route path="/admin/shipments" element={<AdminShipmentsPage />} />
+<Route path="/admin/payments" element={<AdminPaymentsPage />} />
+<Route path="/admin/brands" element={<AdminBrandsPage />} />
         </Route>
       </Route>
 

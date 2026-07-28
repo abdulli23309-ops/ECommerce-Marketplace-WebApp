@@ -1,4 +1,5 @@
-﻿using ECommerce.Domain.Entities;
+﻿using ECommerce.Application.Helpers;
+using ECommerce.Domain.Entities;
 
 namespace ECommerce.Application.Interfaces
 {
@@ -10,6 +11,7 @@ namespace ECommerce.Application.Interfaces
         Task SaveChangesAsync();
         Task<IEnumerable<Payment>> GetAllAsync();
         Task<decimal> GetTotalRevenueAsync();
+        Task<PagedResult<Payment>> GetPagedAsync(int page, int pageSize, string? search = null, string? status = null, string? method = null);
         Task<Payment?> GetPaymentByIdAsync(Guid paymentId);
     }
 }

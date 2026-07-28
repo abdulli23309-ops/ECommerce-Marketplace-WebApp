@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getSellers, approveSeller, rejectSeller } from "../../services/adminService";
+import axiosInstance from "../../services/axiosInstance";
 
 const rejectionOptions = [
   "Incomplete information",
@@ -15,6 +16,8 @@ const SellerApprovalPage = () => {
   const [modalSeller, setModalSeller] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
   const [customReason, setCustomReason] = useState("");
+  const [roles, setRoles] = useState([]);                         // roles with permission groups
+  const [selectedRoleIds, setSelectedRoleIds] = useState({});     // sellerId -> roleId
 
   const loadSellers = async () => {
     setLoading(true);
@@ -28,12 +31,24 @@ const SellerApprovalPage = () => {
     }
   };
 
+  const fetchRoles = async () => {
+    try {
+      const res = await axiosInstance.get("/admin/roles/with-groups");
+      setRoles(res.data || []);
+    } catch (err) {
+      console.error("Failed to load roles", err);
+    }
+  };
+
   useEffect(() => {
     loadSellers();
+    fetchRoles();
   }, []);
 
-  const handleApprove = async (id) => {
-    await approveSeller(id);
+  const handleApprove = async (sellerId) => {
+    const roleId = selectedRoleIds[sellerId] || "";
+    // Send the roleId as a raw JSON string (the backend expects [FromBody] string? roleId)
+    await approveSeller(sellerId, roleId ? `"${roleId}"` : null);
     loadSellers();
   };
 
@@ -51,14 +66,15 @@ const SellerApprovalPage = () => {
     loadSellers();
   };
 
-  if (loading) {
-    return <div style={{ padding: "2rem", color: "#666" }}>Loading sellers...</div>;
-  }
+  const handleRoleChange = (sellerId, roleId) => {
+    setSelectedRoleIds(prev => ({ ...prev, [sellerId]: roleId }));
+  };
+
+  if (loading) return <div style={{ padding: "2rem", color: "#666" }}>Loading sellers...</div>;
 
   return (
     <div>
       <h2 className="section-title">Seller Approval</h2>
-
       {sellers.length === 0 ? (
         <div className="empty-state">No sellers to review.</div>
       ) : (
@@ -83,25 +99,28 @@ const SellerApprovalPage = () => {
                 <td>{seller.storeName || "—"}</td>
                 <td>
                   {seller.storeLogoUrl ? (
-                    <img
-                      src={seller.storeLogoUrl}
-                      alt="Logo"
-                      style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "0.25rem" }}
-                    />
-                  ) : (
-                    "—"
-                  )}
+                    <img src={seller.storeLogoUrl} alt="Logo" style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "0.25rem" }} />
+                  ) : "—"}
                 </td>
                 <td>{seller.status}</td>
                 <td>
                   {seller.status === "Pending" && (
                     <>
-                      <button className="btn-edit" onClick={() => handleApprove(seller.id)}>
-                        Approve
-                      </button>
-                      <button className="btn-delete" onClick={() => openRejectModal(seller)}>
-                        Reject
-                      </button>
+                      <select
+                        className="form-input"
+                        style={{ width: "auto", marginRight: "0.5rem" }}
+                        value={selectedRoleIds[seller.id] || ""}
+                        onChange={(e) => handleRoleChange(seller.id, e.target.value)}
+                      >
+                        <option value="">Select Role</option>
+                        {roles.map(role => (
+                          <option key={role.id} value={role.id}>
+                            {role.name}
+                          </option>
+                        ))}
+                      </select>
+                      <button className="btn-edit" onClick={() => handleApprove(seller.id)}>Approve</button>
+                      <button className="btn-delete" onClick={() => openRejectModal(seller)}>Reject</button>
                     </>
                   )}
                   {seller.status !== "Pending" && "—"}
@@ -112,43 +131,28 @@ const SellerApprovalPage = () => {
         </table>
       )}
 
-      {/* Rejection Modal */}
+      {/* Rejection Modal (unchanged) */}
       {modalSeller && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>Reject Seller: {modalSeller.businessName}</h3>
             <div className="form-group">
               <label className="form-label">Reason</label>
-              <select
-                className="form-input"
-                value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
-              >
+              <select className="form-input" value={rejectReason} onChange={(e) => setRejectReason(e.target.value)}>
                 {rejectionOptions.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
+                  <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>
             </div>
             {rejectReason === "Other" && (
               <div className="form-group">
                 <label className="form-label">Details</label>
-                <textarea
-                  className="form-input"
-                  rows={3}
-                  value={customReason}
-                  onChange={(e) => setCustomReason(e.target.value)}
-                />
+                <textarea className="form-input" rows={3} value={customReason} onChange={(e) => setCustomReason(e.target.value)} />
               </div>
             )}
             <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-              <button className="btn-primary" onClick={handleRejectSubmit}>
-                Confirm Reject
-              </button>
-              <button className="btn-edit-profile" onClick={() => setModalSeller(null)}>
-                Cancel
-              </button>
+              <button className="btn-primary" onClick={handleRejectSubmit}>Confirm Reject</button>
+              <button className="btn-edit-profile" onClick={() => setModalSeller(null)}>Cancel</button>
             </div>
           </div>
         </div>
